@@ -29,6 +29,10 @@ This is the test automation project for **Stonewake**, our product. It contains 
 - Latest gate run: [41877426539](https://github.com/kaylamenashe8/stonewake-final-repo/actions/runs/41877426539), **failed** (on `e745779`: UI migration #37 merged, API migration #32, #36 and UI review fixes #44 not yet). The final run link and its 5/5 result go here at 20:20-20:40.
 - HTML report: [latest run](https://kaylamenashe8.github.io/stonewake-final-repo/latest/) · history of every run and gate: [Pages index](https://kaylamenashe8.github.io/stonewake-final-repo/) (GitHub Pages, published by ci.yml).
 
+### Slack notifications
+- CI (`ci.yml`) and the triage ladder (`triage.yml`) post each run's result and the triage verdicts to a Slack channel through an Incoming Webhook (D10).
+- Judges who want to see the channel: contact Kayla ([GitHub @kaylamenashe8](https://github.com/kaylamenashe8)) and she will add you to the Slack workspace.
+
 ### Known product bugs
 Recorded in [BUGS.md](docs/BUGS.md) (system of record: SpiraTest, D10).
 
