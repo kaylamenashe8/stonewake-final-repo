@@ -12,6 +12,7 @@
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
+    "pre-pr": "node scripts/pre-pr.mjs",
     "verify": "npm run lint && npm run typecheck && playwright test --grep @smoke --project=chromium",
     "report": "playwright show-report",
     "version-check": "bash scripts/version-check.sh",

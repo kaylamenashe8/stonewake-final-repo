@@ -11,6 +11,7 @@ triage/out/
 heal-report.json
 .agents/status/*.json
 !.agents/status/.gitkeep
+.agents/review/
 .DS_Store
 
 # from the original repo
