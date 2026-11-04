@@ -196,6 +196,14 @@ textarea{width:100%;min-height:90px;border:2px solid var(--line);border-radius:1
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 .errors{background:var(--sun-soft);color:var(--sun);border-radius:var(--r);padding:10px 14px;font-size:13.5px;font-weight:600}
 .errors ul{margin:4px 0 0;padding-left:18px;font-weight:500}
+.gapsbox{border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.gapsbox .gh{display:flex;gap:10px;align-items:baseline;padding:10px 14px;font-weight:700}
+.gapsbox .gh a{margin-left:auto;font-size:13px}
+.gapsbox .g{display:grid;grid-template-columns:4px minmax(0,1fr);gap:10px;padding:8px 14px;border-top:1px solid var(--line);font-size:13.5px}
+.gapsbox .g i{border-radius:2px;background:var(--line)}
+.gapsbox .g.high i{background:var(--berry)} .gapsbox .g.medium i{background:var(--sun)}
+.gapsbox .g b{font-family:var(--f-mono, ui-monospace, monospace);font-size:12px;color:var(--muted);margin-right:6px}
+.gapsbox .g small{display:block;color:var(--muted)}
 .chip.stale{background:var(--sun-soft);color:var(--sun)}
 .job.skip i{background:var(--soft);color:var(--muted)}
 .loading{color:var(--muted);font-weight:600;padding:24px 0}
@@ -383,6 +391,13 @@ textarea{width:100%;min-height:90px;border:2px solid var(--line);border-radius:1
     return out;
   }
 
+  const RUN_SHEET = 'https://claude.ai/artifact/Xi1rjC9C11Ttz1CNeB6tXD';
+  function gapsCard(){
+    const g = S?.gaps; if (!g) return '';
+    const run = (S.sessions ?? []).filter(x => x.kind === 'subagent').length;
+    return `<div class="gapsbox"><div class="gh">Gaps <span class="muted">${g.length ? `${g.filter(x=>x.sev==='high').length} urgent · ${g.length} total` : 'none'} · ${run} agent sessions running</span><a href="${RUN_SHEET}" target="_blank" rel="noopener">Run sheet</a></div>
+      ${g.map(x => `<div class="g ${esc(x.sev)}"><i></i><div><b>${esc(x.area)}</b>${esc(x.text)}<small>${esc(x.fix)}</small></div></div>`).join('')}</div>`;
+  }
   function errorsBanner(){
     const errs = [...(loadError ? [loadError] : []), ...(S?.errors ?? [])];
     return errs.length ? `<div class="errors">Some data is missing<ul>${errs.map(e => `<li>${esc(e)}</li>`).join('')}</ul></div>` : '';
@@ -402,7 +417,7 @@ textarea{width:100%;min-height:90px;border:2px solid var(--line);border-radius:1
         <div class="acts"><a class="btn go sm" href="#runs">Open runs</a></div></article>`;
     };
     const ag = S.agents;
-    return `${errorsBanner()}${clockCard()}
+    return `${errorsBanner()}${clockCard()}${gapsCard()}
       <div class="sh"><h2>Needs you</h2><span class="muted">${list.length ? `${list.length} things` : ''}</span></div>
       ${list.length ? `<div class="needs">${list.map(card).join('')}</div>` : `<div class="allgood">${face('done',36)} Nothing needs you right now.</div>`}
       <div class="sh"><h2>Agents</h2><span class="muted">${ag.filter(a=>a.state==='working').length} working · ${ag.filter(a=>a.state==='review').length} in review · ${ag.filter(a=>a.state==='done').length} done</span><div class="sp"><a class="btn sm" href="#team">All agents</a></div></div>
