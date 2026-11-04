@@ -19,6 +19,11 @@ export default tseslint.config(
       'triage/out/**',
       '**/*.js',
       '**/*.mjs',
+      // Legacy flat specs from the baseline (177 errors, 54 warnings, docs/BASELINE.md). They are being moved
+      // and fixed by the Stabilizers (tests/api/existing/, tests/e2e/); the moved files are linted in full.
+      // Remove these two lines once both files are gone (DECISIONS D16).
+      'tests/api.spec.ts',
+      'tests/ui.spec.ts',
     ],
   },
   js.configs.recommended,

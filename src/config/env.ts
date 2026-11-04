@@ -22,6 +22,8 @@ const schema = z.object({
   API_URL: z.preprocess(emptyToUndefined, z.url().optional()),
   TEST_USER: z.preprocess(emptyToUndefined, z.string().optional()),
   TEST_PASSWORD: z.preprocess(emptyToUndefined, z.string().optional()),
+  /** Stonewake REST API key (Bearer, role viewer). Optional: only the API project needs it. Never log it. */
+  STONEWAKE_API_KEY: z.preprocess(emptyToUndefined, z.string().optional()),
   TEST_ID_ATTRIBUTE: z.preprocess(emptyToUndefined, z.string().default('data-testid')),
   HEAL_MODE: z.preprocess(emptyToUndefined, z.enum(['off', 'log', 'strict']).default('log')),
   RUN_ID: z.preprocess(emptyToUndefined, z.string().default(`local-${Date.now().toString(36)}`)),
