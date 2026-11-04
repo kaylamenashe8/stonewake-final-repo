@@ -23,10 +23,12 @@
 | ID | Category | File | Problem | Fix | Commit |
 |---|---|---|---|---|---|
 | F1 | secrets in code | .env (committed) | Credentials (email, password, API key) committed to a public repo in .env | Untracked .env, added to .gitignore; values moved to GitHub secrets/variables | a983764 |
-| F2 | secrets in code | tests/ui.spec.ts, tests/api.spec.ts | Email, password and API key hardcoded in the test files | Open: read from env (TEST_USER, TEST_PASSWORD, STONEWAKE_API_KEY) | |
+| F2 | secrets in code | tests/ui.spec.ts, tests/api.spec.ts | Email, password and API key hardcoded in the test files (they belong to Judge 2, the judges' shared workspace) | Open: read from env (TEST_USER, TEST_PASSWORD, STONEWAKE_API_KEY) | |
 | F3 | config | node_modules/, test-results/, playwright-report/ | 399 generated files committed to git | Untracked and ignored | a983764 |
 | F4 | wrong assertion | tests/api.spec.ts ('api 2 me' and others) | Sends `Authorization: Token <key>`; the API documents `Bearer` | Open: use `Bearer` | |
 | F5 | hard wait | tests/ui.spec.ts ('ui 1 login ok') | `page.waitForTimeout(2000)` | Open: wait on the URL or a visible element | |
 | F6 | brittle selector | tests/ui.spec.ts | XPath (`//h1[text()=...]`, `//aside//button`) and CSS-class selectors | Open: role/label locators | |
 | F7 | config | tests/*.spec.ts, playwright.config.ts | Absolute URLs hardcoded in every test; no baseURL | Open: baseURL / API_URL from env | |
 | F8 | config | src/pages/LoginPage.ts (kit) | Sign in stays disabled until the "I agree to the Evaluation Terms" checkbox is ticked | Login ticks the terms checkbox by role and name | a983764 |
+| F9 | config | .env, tests/*.spec.ts | The suite ran against the judges' shared workspace (Judge 2 login and API key), not the finalist's own | .env and GitHub secrets switched to the Finalist 4 workspace; tests must read credentials from env | (local .env + secrets) |
+| F10 | brittle selector | src/pages/LoginPage.ts (kit) | `Sign in` role locator also matched "Email me a link to sign in instead", so it healed to a CSS fallback | Exact name match `^(log in|sign in)$` | |

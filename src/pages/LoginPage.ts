@@ -26,7 +26,7 @@ export class LoginPage extends BasePage {
 
   readonly submit = element(
     'Login > Submit',
-    by.role('button', /log ?in|sign ?in/i),
+    by.role('button', /^(log ?in|sign ?in)$/i),
     by.testId('login-button'),
     by.css('[type="submit"]'),
   );
