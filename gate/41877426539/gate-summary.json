@@ -1,0 +1,233 @@
+{
+  "green": false,
+  "greenRuns": 0,
+  "totalRuns": 5,
+  "verdict": "GATE: 0/5 — RED in run-1, run-2, run-3, run-4, run-5",
+  "rows": [
+    {
+      "run": 1,
+      "missing": false,
+      "passed": 23,
+      "failed": 5,
+      "flaky": 0,
+      "skipped": 1,
+      "healed": 0,
+      "durationMs": 29104.77490234375,
+      "failures": [
+        {
+          "test": "api.spec.ts > api 1 health",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: 200"
+        },
+        {
+          "test": "api.spec.ts > api 2 me",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: 200"
+        },
+        {
+          "test": "api.spec.ts > api 5 portfolio list",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: true"
+        },
+        {
+          "test": "api.spec.ts > api 9 countries",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: \"GE\""
+        },
+        {
+          "test": "api.spec.ts > api 10 search",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: \"Input should be less than or equal to 50\""
+        }
+      ],
+      "flakyTests": [],
+      "skippedWithBug": [],
+      "green": false
+    },
+    {
+      "run": 2,
+      "missing": false,
+      "passed": 23,
+      "failed": 5,
+      "flaky": 0,
+      "skipped": 1,
+      "healed": 0,
+      "durationMs": 25727.534912109375,
+      "failures": [
+        {
+          "test": "api.spec.ts > api 1 health",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: 200"
+        },
+        {
+          "test": "api.spec.ts > api 2 me",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: 200"
+        },
+        {
+          "test": "api.spec.ts > api 5 portfolio list",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: true"
+        },
+        {
+          "test": "api.spec.ts > api 9 countries",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: \"GE\""
+        },
+        {
+          "test": "api.spec.ts > api 10 search",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: \"Input should be less than or equal to 50\""
+        }
+      ],
+      "flakyTests": [],
+      "skippedWithBug": [],
+      "green": false
+    },
+    {
+      "run": 3,
+      "missing": false,
+      "passed": 23,
+      "failed": 5,
+      "flaky": 0,
+      "skipped": 1,
+      "healed": 0,
+      "durationMs": 30943.819091796875,
+      "failures": [
+        {
+          "test": "api.spec.ts > api 1 health",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: 200"
+        },
+        {
+          "test": "api.spec.ts > api 2 me",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: 200"
+        },
+        {
+          "test": "api.spec.ts > api 5 portfolio list",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: true"
+        },
+        {
+          "test": "api.spec.ts > api 9 countries",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: \"GE\""
+        },
+        {
+          "test": "api.spec.ts > api 10 search",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: \"Input should be less than or equal to 50\""
+        }
+      ],
+      "flakyTests": [],
+      "skippedWithBug": [],
+      "green": false
+    },
+    {
+      "run": 4,
+      "missing": false,
+      "passed": 23,
+      "failed": 5,
+      "flaky": 0,
+      "skipped": 1,
+      "healed": 0,
+      "durationMs": 30909.5810546875,
+      "failures": [
+        {
+          "test": "api.spec.ts > api 1 health",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: 200"
+        },
+        {
+          "test": "api.spec.ts > api 2 me",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: 200"
+        },
+        {
+          "test": "api.spec.ts > api 5 portfolio list",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: true"
+        },
+        {
+          "test": "api.spec.ts > api 9 countries",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: \"GE\""
+        },
+        {
+          "test": "api.spec.ts > api 10 search",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: \"Input should be less than or equal to 50\""
+        }
+      ],
+      "flakyTests": [],
+      "skippedWithBug": [],
+      "green": false
+    },
+    {
+      "run": 5,
+      "missing": false,
+      "passed": 23,
+      "failed": 5,
+      "flaky": 0,
+      "skipped": 1,
+      "healed": 0,
+      "durationMs": 22468.571044921875,
+      "failures": [
+        {
+          "test": "api.spec.ts > api 1 health",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: 200"
+        },
+        {
+          "test": "api.spec.ts > api 2 me",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: 200"
+        },
+        {
+          "test": "api.spec.ts > api 5 portfolio list",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: true"
+        },
+        {
+          "test": "api.spec.ts > api 9 countries",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: \"GE\""
+        },
+        {
+          "test": "api.spec.ts > api 10 search",
+          "file": "api.spec.ts",
+          "project": "chromium",
+          "error": "Error: expect(received).toBe(expected) // Object.is equality  Expected: \"Input should be less than or equal to 50\""
+        }
+      ],
+      "flakyTests": [],
+      "skippedWithBug": [],
+      "green": false
+    }
+  ]
+}
