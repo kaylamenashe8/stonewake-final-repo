@@ -52,10 +52,19 @@ export class CompanyPage extends BasePage {
     return (await this.partyRows()).filter({ has: this.page.getByRole('cell').last().getByRole('button') });
   }
 
+  /** Rows of the "Owned by" group (the group label prefixes its first row). */
+  async ownerRows(): Promise<Locator> {
+    return (await this.partyRows()).filter({ hasText: /^Owned by/ });
+  }
+
+  /** Rows of the "Officers" group (the group label prefixes its first row). */
+  async officerRows(): Promise<Locator> {
+    return (await this.partyRows()).filter({ hasText: /^Officers/ });
+  }
+
   /** Names of the parties listed as "Owned by" in the officers and ownership table. */
   async ownerNames(): Promise<string[]> {
-    const owners = (await this.partyRows()).filter({ hasText: /^Owned by/ });
-    return (await owners.getByRole('link').allInnerTexts()).map((n) => n.trim());
+    return (await (await this.ownerRows()).getByRole('link').allInnerTexts()).map((n) => n.trim());
   }
 
   /**

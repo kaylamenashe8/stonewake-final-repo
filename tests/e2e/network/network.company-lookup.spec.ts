@@ -29,10 +29,9 @@ test.describe('Network company lookup @regression', () => {
 
     const owners =
       await test.step('owners and officers are listed, every row cited to a register', async () => {
-        const rows = await company.partyRows();
-        await expect(rows.filter({ hasText: /^Owned by/ })).not.toHaveCount(0);
-        await expect(rows.filter({ hasText: /^Officers/ })).not.toHaveCount(0);
-        const total = await rows.count();
+        await expect(await company.ownerRows()).not.toHaveCount(0);
+        await expect(await company.officerRows()).not.toHaveCount(0);
+        const total = await (await company.partyRows()).count();
         await expect(await company.citedPartyRows()).toHaveCount(total);
         return company.ownerNames();
       });
