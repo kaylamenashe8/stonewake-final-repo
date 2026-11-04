@@ -1,6 +1,6 @@
 import { test, expect } from '../../../src/fixtures';
 import { requirement } from '../../../src/utils/annotations';
-import { Sidebar } from '../../../src/components/Sidebar';
+import { AppPage } from '../../../src/pages/AppPage';
 import { credentials, signedOut } from './credentials';
 
 // Sign-in form tests run without the shared session (storageState) so they see the real /login page.
@@ -13,39 +13,46 @@ test.describe('Login form', () => {
   }) => {
     test.skip(!credentials.available, 'TEST_USER/TEST_PASSWORD not set');
     requirement('REQ-AUTH-01');
-    await page.goto('/');
-    await expect(page).toHaveURL((url) => url.pathname === '/login');
-    await expect(page).toHaveTitle('Sign in · Stonewake');
-    await expect(await loginPage.headingText()).toBeVisible();
 
-    await loginPage.login(credentials.user, credentials.password);
+    await test.step('an app page without a session shows the sign-in form', async () => {
+      await page.goto('/');
+      await expect(page).toHaveURL((url) => url.pathname === '/login');
+      await expect(page).toHaveTitle('Sign in · Stonewake');
+      await expect(await loginPage.heading()).toBeVisible();
+    });
 
-    await expect(page).toHaveURL((url) => url.pathname === '/');
-    await expect(page).toHaveTitle('Deal Book · Stonewake');
-    await expect(page.getByRole('main').getByRole('heading', { level: 1 })).toHaveText('Deal Book');
-    const sidebar = new Sidebar(page);
-    await expect(await sidebar.teamPicker()).toBeVisible();
-    for (const module of ['Deal Book', 'Portfolio', 'Countries']) {
-      await expect(sidebar.navLink(module)).toBeVisible();
-    }
-    await expect(sidebar.root.getByRole('button', { name: 'Sign out', exact: true })).toBeVisible();
+    await test.step('valid credentials land on the Deal Book with the sidebar', async () => {
+      await loginPage.login(credentials.user, credentials.password);
+      await expect(page).toHaveURL((url) => url.pathname === '/');
+      await expect(page).toHaveTitle('Deal Book · Stonewake');
+      const app = new AppPage(page);
+      await expect(app.pageHeading()).toHaveText('Deal Book');
+      await expect(await app.sidebar.teamPicker()).toBeVisible();
+      for (const module of ['Deal Book', 'Portfolio', 'Countries']) {
+        await expect(app.sidebar.navLink(module)).toBeVisible();
+      }
+      await expect(await app.sidebar.signOutControl()).toBeVisible();
+    });
   });
 
-  test('ui 2 wrong password: should show an error and stay on /login when the password is wrong @regression', async ({
+  test('ui 2 wrong password: should show an error and stay on /login when the email and password do not match @regression', async ({
     page,
     loginPage,
+    data,
   }) => {
-    test.skip(!credentials.available, 'TEST_USER not set');
     requirement('REQ-AUTH-02');
     await loginPage.goto();
-    await loginPage.login(credentials.user, 'definitely-wrong-password-123');
+    // A RUN_ID-prefixed address that has no account, never the shared TEST_USER: repeated failed sign-ins
+    // (pre-pr runs this 20+ times) could lock the account every other test signs in with. The product
+    // shows the same "do not match" copy for an unknown email as for a wrong password.
+    await loginPage.login(data.email(), 'not-the-password');
 
     await expect(await loginPage.errorMessage()).toHaveText(
       'That email and password do not match. Check both and try again.',
     );
     await expect(page).toHaveURL((url) => url.pathname === '/login');
-    await expect(await loginPage.headingText()).toBeVisible();
-    await expect(new Sidebar(page).root).toHaveCount(0);
+    await expect(await loginPage.heading()).toBeVisible();
+    await expect(new AppPage(page).sidebar.root).toHaveCount(0);
   });
 
   test('ui 3 terms checkbox: should enable Sign in only when the terms are accepted @regression', async ({

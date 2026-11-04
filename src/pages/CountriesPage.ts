@@ -17,8 +17,8 @@ export class CountriesPage extends AppPage {
     await (await this.el(this.search)).fill(text);
   }
 
-  noMatchMessage(): Locator {
-    return this.noMatch.primary(this.page);
+  noMatchMessage(): Promise<Locator> {
+    return this.el(this.noMatch);
   }
 
   countryLink(name: string): Locator {

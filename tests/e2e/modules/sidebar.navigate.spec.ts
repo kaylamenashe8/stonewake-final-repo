@@ -11,11 +11,9 @@ test.describe('Sidebar navigation', () => {
     await app.goto();
 
     // The module list depends on the workspace's team (C5): drive the test from what the sidebar shows.
-    const links = app.sidebar.navLinks();
-    await expect(links.first()).toBeVisible();
-    const modules = await links.evaluateAll((els) =>
-      els.map((a) => ({ name: (a as HTMLElement).innerText.trim(), path: a.getAttribute('href') ?? '' })),
-    );
+    // first(): readiness only, the module list has rendered before it is read.
+    await expect(app.sidebar.navLinks().first()).toBeVisible();
+    const modules = await app.sidebar.modules();
     expect(modules.length).toBeGreaterThan(0);
 
     for (const { name, path } of modules) {

@@ -3,14 +3,20 @@ import { BasePage } from './BasePage';
 import { by, element } from './spec';
 
 /**
+ * Sign-in route. Not configurable yet: LOGIN_PATH is not in the env schema (src/config/env.ts), requested
+ * from the Architect in docs/CHANGELOG.md.
+ */
+const LOGIN_PATH = '/login';
+
+/**
  * Stonewake sign-in form (/login): Email, Password, a custom "I agree to the Evaluation Terms" checkbox
  * (button[role=checkbox]) that gates the "Sign in" button, and an "Email me a link" button that must never
  * match the Sign in locator (F10). Primaries are role/label; alternates stay as heal fallbacks.
  */
 export class LoginPage extends BasePage {
-  protected override readonly path = process.env.LOGIN_PATH ?? '/login';
+  protected override readonly path = LOGIN_PATH;
 
-  readonly heading = element('Login > Heading', by.role('heading', 'Sign in'), by.css('main h1, h1'));
+  readonly signInHeading = element('Login > Heading', by.role('heading', 'Sign in'), by.css('main h1'));
 
   readonly username = element(
     'Login > Email',
@@ -39,14 +45,16 @@ export class LoginPage extends BasePage {
     by.css('a[href$="/terms"]'),
   );
 
-  readonly error = element('Login > Error', by.text(/do not match/i), by.role('alert'));
+  // The message is a plain <p> (no role=alert; the page's only alert is the empty route announcer), so text
+  // is the strongest locator available.
+  readonly error = element('Login > Error', by.text(/do not match/i), by.text(/check both and try again/i));
 
   override async waitUntilReady(): Promise<void> {
-    await expect(await this.el(this.heading)).toBeVisible();
+    await expect(await this.heading()).toBeVisible();
   }
 
-  headingText(): Promise<Locator> {
-    return this.el(this.heading);
+  heading(): Promise<Locator> {
+    return this.el(this.signInHeading);
   }
 
   submitButton(): Promise<Locator> {

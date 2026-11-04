@@ -14,7 +14,7 @@ test.describe('Session guard', () => {
     for (const path of ['/', '/portfolio', '/countries/DEU', '/entities']) {
       await page.goto(path);
       await expect(page, `${path} should redirect to /login`).toHaveURL((url) => url.pathname === '/login');
-      await expect(await loginPage.headingText()).toBeVisible();
+      await expect(await loginPage.heading()).toBeVisible();
     }
     await expect(new Sidebar(page).root).toHaveCount(0);
   });
