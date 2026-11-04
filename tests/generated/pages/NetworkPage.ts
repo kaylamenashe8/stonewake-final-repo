@@ -1,12 +1,12 @@
 import type { Page } from '@playwright/test';
-import { BasePage } from '../../../src/pages/BasePage';
+import { AppPage } from '../../../src/pages/AppPage';
 import { by, element } from '../../../src/pages/spec';
 
 const SEARCH = /\/search(\?|$)/;
 
 /** Network (sidebar > Network): company lookup by name; results are register entities. */
-export class NetworkPage extends BasePage {
-  protected readonly path = '/network';
+export class NetworkPage extends AppPage {
+  protected override readonly path = '/network';
 
   readonly lookup = element(
     'Network > Look up a company',

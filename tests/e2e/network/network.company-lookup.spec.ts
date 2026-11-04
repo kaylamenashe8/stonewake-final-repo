@@ -24,7 +24,7 @@ test.describe('Network company lookup @regression', () => {
       await network.openResult(COMPANY, COUNTRY);
       await expect(page).toHaveURL(/\/entities\/n\d+/);
       await company.waitUntilReady();
-      await expect(await company.titleHeading()).toHaveText(COMPANY);
+      await expect(company.titleHeading()).toHaveText(COMPANY);
     });
 
     const owners =

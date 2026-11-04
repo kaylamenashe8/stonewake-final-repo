@@ -1,21 +1,11 @@
 import type { Locator, Page } from '@playwright/test';
-import { BasePage } from '../../../src/pages/BasePage';
+import { AppPage } from '../../../src/pages/AppPage';
 import { by, element } from '../../../src/pages/spec';
 
 /** Company profile (/entities/:id), opened from a Network lookup: officers, owners, ownership chain. */
-export class CompanyPage extends BasePage {
+export class CompanyPage extends AppPage {
   /** Reached from a Network lookup (entity ids are register data); goto() is not used. */
-  protected readonly path = '/entities';
-
-  readonly title = element(
-    'Company > Title',
-    {
-      strategy: 'role',
-      describe: "getByRole('main').getByRole('heading', { level: 1 })",
-      build: (p: Page) => p.getByRole('main').getByRole('heading', { level: 1 }),
-    },
-    by.css('main h1'),
-  );
+  protected override readonly path = '/entities';
 
   readonly ownershipChainHeading = element(
     'Company > Ownership chain heading',
@@ -37,8 +27,9 @@ export class CompanyPage extends BasePage {
     await this.el(this.ownershipChainHeading);
   }
 
-  titleHeading(): Promise<Locator> {
-    return this.el(this.title);
+  /** The company name heading (the page's level-1 heading, from AppPage). */
+  titleHeading(): Locator {
+    return this.pageHeading();
   }
 
   /** Party rows (owners and officers); the header row has no link. A collection, derived from partiesTable. */
