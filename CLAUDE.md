@@ -5,6 +5,7 @@ Goal on the day: turn an unknown flaky Playwright/TS repo into a stable suite pr
 Stability Gate (retries 0, zero heals), with every decision documented.
 
 ## Hard rules
+- Read `docs/product/README.md` (and the files it lists) before testing.
 - Work only in your owned paths (see `.claude/agents/<you>.md`). Shared files (`playwright.config.ts`,
   `package.json`, `tsconfig.json`, `eslint.config.mjs`) belong to the Architect: request changes in your
   `docs/CHANGELOG.md` entry; the Lead applies them.
