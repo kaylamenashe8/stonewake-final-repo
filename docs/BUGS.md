@@ -4,7 +4,7 @@
 
 | Spira ID | Title | Severity | Found by | Jam | Linked test | Status |
 |---|---|---|---|---|---|---|
-| <!-- SPIRA-? --> | | | test / crawler / exploratory / triage | | | draft |
+| [SPIRA-89](https://itac.spiraservice.net/33/Incident/89.aspx) | MCP: tool call without credential answers HTTP 401, docs say HTTP 200 for -32001 | low | exploratory (API lane) | [Jam](https://jam.dev/c/d4f29d0e-151d-4d65-9ffc-0f5f65010ea8) | tests/api/mcp.entity.spec.ts | filed |
 
 ## Drafts
 
@@ -26,16 +26,25 @@
 - Linked test: tests/e2e/<feature>/<file>.spec.ts
 - Spira: pending
 
-### DRAFT-CG-01: Deal page: Download report fails silently when the report endpoint is rate limited (HTTP 429)
-- Environment: https://app.stonewake.ai, Chromium (Playwright 1.64.1), 2026-11-04 18:39 IST, Finalist 4 workspace (team itac-4), commit a6ed91c
-- Found by: crawler (promotion run of `dealbook.report-pdf.spec.ts`, 10 downloads in ~40 s, 1 worker)
-- Preconditions: logged in; any deal page (seen on /deals/5df4ec755205)
+### SPIRA-89 (was DRAFT-02): MCP: tool call without credential answers HTTP 401, docs say HTTP 200 for -32001
+- Environment: https://mcp.stonewake.ai/ (JSON-RPC over HTTP; curl and Chromium via Playwright), 2026-11-04 17:39 and 17:47 UTC, commit 7edc10b
+- Preconditions: none (no API key is sent)
 - Steps:
-  1. Open a deal from the Deal Book.
-  2. Click **Download report** about 8-9 times within a minute (or once more after other report downloads by the same user).
-- Expected: the PDF downloads, or the user sees a clear message such as "Too many downloads, try again in 9 s".
-- Actual: `GET https://api.stonewake.ai/deals/<id>/report` returns **429** with `Retry-After: 9`. No file is downloaded, the page's alert region stays empty, and the button gives no feedback. The click silently does nothing.
-- Severity: low (UX / error handling); Priority: P3
-- Evidence: trace `test-results/promote/dealbook.export-Deal-Book--b158f--Download-report-is-clicked-chromium-repeat8/trace.zip` (network tab: report request 429, retry-after 9), error-context.md in the same folder (empty `alert`). Jam: to record (Bug Reporter).
-- Linked test: tests/generated/dealbook.report-pdf.spec.ts (parked: the 10x promotion burst trips the limit; one PDF download per gate run would not)
-- Spira: pending
+  1. POST https://mcp.stonewake.ai/ with headers Content-Type: application/json and Accept: application/json, text/event-stream, and no Authorization header
+  2. Body: {"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"company_profile","arguments":{"node_id":"x"}}}
+  3. Repeat with header MCP-Protocol-Version: 2025-06-18 (an earlier revision)
+  4. Read the HTTP status and the JSON-RPC error
+- Expected: HTTP 200 carrying JSON-RPC error -32001. Docs https://docs.stonewake.ai/mcp (Errors) say "A tool call whose key is missing or refused answers a JSON-RPC error with the stable code `-32001`" and "Under the revision `2026-07-28` the codes `-32700`, `-32600`, `-32602`, `-32020` and `-32022` come back with HTTP 400 and `-32601` with HTTP 404. Under the earlier revisions only `-32700` and `-32600` come back with HTTP 400. Every other JSON-RPC error comes back with HTTP 200, the status at which the clients of the earlier revisions read it and keep their session."
+- Actual: HTTP 401 with {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"No credential was sent. Supply your Stonewake API key as the Bearer token on every MCP request ..."}} for both requests (with and without MCP-Protocol-Version). The call is still refused, so this is a contract/docs mismatch on the HTTP status only; a client of an earlier revision that reads errors at HTTP 200 may treat the 401 as a transport failure.
+- Severity: low
+- Priority: P3
+- Jam: https://jam.dev/c/d4f29d0e-151d-4d65-9ffc-0f5f65010ea8
+- Repro run: chromium, Playwright 1.64.1, retries 0, trace + video on, 2026-11-04 17:47 UTC, commit 7edc10b. Expected 200, received 401.
+- Evidence notes: the Jam holds the video and Playwright trace; its network tab shows `POST 401 https://mcp.stonewake.ai/`. Its one console error is a CSP notice from the docs page and is unrelated.
+- Linked test: tests/api/mcp.entity.spec.ts
+- Known-bug handling: the existing -32001 test in tests/api/mcp.entity.spec.ts stays as it is (it asserts only the JSON-RPC code and passes), and a new skipped knownBug('SPIRA-89', ...) test checking for HTTP 200 is added by the api lane (requested 20:07), so a fix can be confirmed. API-only bug, no screenshot attached in Spira.
+- Spira: [SPIRA-89](https://itac.spiraservice.net/33/Incident/89.aspx)
+
+## Reviewed, not filed
+
+- `GET /v1/deals?team=abc` answers 403 `forbidden` (reported as "malformed team should give 422"). Not a bug: the docs (https://docs.stonewake.ai/v1, `GET /v1/deals`) say "An empty or malformed `team` answers 422 naming it, and a well formed team outside your access answers 403, the same for one that does not exist", and the OpenAPI schema (https://api.stonewake.ai/openapi.json, `team`) defines well formed as `^[A-Za-z0-9_-]+$`, 1-16 characters. `abc` is well formed, so 403 is the documented answer. Checked 2026-11-04 17:39 UTC: `team=` -> 422 `string_too_short`, `team=a!b` -> 422 `string_pattern_mismatch`, 17 characters -> 422 `string_too_long`. Related test: tests/api/deals.filters.spec.ts.
