@@ -1,6 +1,12 @@
 import { readFile } from 'node:fs/promises';
 import type { Download } from '@playwright/test';
 
+/** Bytes needed for the longest signature checked (%PDF-). */
+const SIGNATURE_BYTES = 5;
+
+/** Smaller than any real export; catches empty or error-page downloads. */
+export const MIN_EXPORT_BYTES = 1_000;
+
 export interface SavedFile {
   filename: string;
   bytes: number;
@@ -13,5 +19,9 @@ export async function savedFile(download: Download): Promise<SavedFile> {
   const failure = await download.failure();
   if (failure) throw new Error(`download failed: ${failure}`);
   const content = await readFile(await download.path());
-  return { filename: download.suggestedFilename(), bytes: content.length, magic: content.subarray(0, 5).toString('latin1') };
+  return {
+    filename: download.suggestedFilename(),
+    bytes: content.length,
+    magic: content.subarray(0, SIGNATURE_BYTES).toString('latin1'),
+  };
 }

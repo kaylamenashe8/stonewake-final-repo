@@ -1,7 +1,7 @@
 import { test, expect } from '../../../src/fixtures';
 import { aiGenerated, requirement } from '../../../src/utils/annotations';
 import { DealBookPage } from '../../generated/pages/DealBookPage';
-import { savedFile } from '../../generated/pages/downloads';
+import { MIN_EXPORT_BYTES, savedFile } from '../../generated/pages/downloads';
 
 test.describe('Deal Book Excel export @regression', () => {
   test('should download an Excel workbook when Export is clicked on the Deal Book', async ({ page }) => {
@@ -14,6 +14,6 @@ test.describe('Deal Book Excel export @regression', () => {
 
     expect(file.filename).toMatch(/^Stonewake - Deal Book - \d{4}-\d{2}-\d{2}\.xlsx$/);
     expect(file.magic).toMatch(/^PK/); // xlsx is a zip container
-    expect(file.bytes).toBeGreaterThan(1_000);
+    expect(file.bytes).toBeGreaterThan(MIN_EXPORT_BYTES);
   });
 });
