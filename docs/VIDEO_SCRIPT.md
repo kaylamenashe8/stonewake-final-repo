@@ -1,13 +1,16 @@
 # Summary video script (3-4 min)
 
-> Owner: Scribe, draft by 20:10. Record at 20:40 (screen capture + voice-over; fallback: voice-over on the README scroll).
+> Owner: Scribe. Record at 20:40 (screen capture + voice-over; fallback: voice-over on the README scroll).
 > Upload as YouTube unlisted or Loom public; link in README and the form.
+> Every number below comes from a file: [BASELINE.md](BASELINE.md), [FIXES.md](FIXES.md), [TEST_PLAN.md](TEST_PLAN.md).
+> Lines marked **[gate]** are read off the final Stability Gate's `gate-summary` job before recording; if the gate
+> is not 5/5 green, say what it shows and link the latest run, as the README does.
 
-| Time | Section | On screen | Say (with numbers) |
+| Time | Section | On screen | Say |
 |---|---|---|---|
-| 0:00-0:30 | Starting state | BASELINE counts table, red first CI run | "We got <N> tests: <x> passing, <y> failing, <z> flaky; <h> hard waits, <l> lint errors." |
-| 0:30-1:10 | Problems found | FIXES.md category summary | "Top root causes: <category> x<n>, <category> x<n>, ..." |
-| 1:10-2:00 | What changed | Repo tree / ARCHITECTURE, lint job, Dockerfile, ci.yml, triage verdict | "Layered POM + fixtures, strict TS + Playwright lint, pinned Docker image, CI with Pages + Slack, a triage ladder ending with Claude." |
-| 2:00-2:50 | How stability improved | Before/after flakiness matrix, gate-summary table | "5/5 green, retries 0, 0 heals, run time <before> -> <after>." |
-| 2:50-3:30 | Why it is credible | README Known product bugs, Spira + Jam, decision log | "Retries 0, no healing in the gate, 5 parallel independent runs, every known bug disclosed with its Spira ID, everything reproducible from the README." |
-| 3:30-3:50 | Close | README links | "Repo, gate run and report are in the README." |
+| 0:00-0:30 | Starting state | BASELINE.md "Counts" table; `b4f92c9:test-results/` failure folders | "We got 20 tests, 10 UI and 10 API. Run 5 times, retries off, 4 workers: 10 passed 5 out of 5, 10 failed 0 out of 5, none flaky. Every failure was deterministic. Lint: 177 errors and 54 warnings. 3 hard waits, 18 XPath selectors, 67 hardcoded URLs, and the judges' own credentials in the code." |
+| 0:30-1:10 | Problems found | FIXES.md "Summary by category", then BASELINE "Failure clusters" | "We grouped the 10 failures into 5 clusters. None was a product bug: the tests were wrong. For example, a health check on /v1/health when health lives at /health, a Token header when the API wants Bearer, Germany expected as GE instead of DE, and a sidebar module that our workspace doesn't have. 32 fixes are logged: 7 wrong assertions, 7 brittle selectors, 6 config, 3 secrets in code, 3 shared data, 2 hard-wait fixes covering all 3 waits, 2 outdated API, 2 test interdependence." |
+| 1:10-2:00 | What changed | Repo tree (`src/pages`, `src/api`, `tests/e2e`, `tests/api`), eslint.config.mjs, Dockerfile, ci.yml, REVIEW_CHECKLIST.md | "The tests now use page objects with role and label locators, and each element is declared once. API calls go through one client, and every response is checked against a zod schema. The login session is shared through storageState. Lint runs strict TypeScript and Playwright rules. CI runs in the pinned Playwright Docker image. Every PR passes a self-review checklist and a pre-PR gate that runs each changed spec 10 times on 1 worker and 10 times on 4 before anyone can push." |
+| 2:00-2:50 | How stability improved | Before/after: BASELINE counts vs gate-summary table | "Before: 10 of 20 green. **[gate]** After: <passed>/<total> green in each of 5 parallel runs, retries 0, 0 heals, suite time <before 33 s per pass> to <after>. New coverage on master: plan items T01, T16, T17, T18, T20 and T21, Deal Book UI plus API and MCP contracts. Each one went in only after 10 green runs out of 10." |
+| 2:50-3:30 | Why it is credible | README "Known product bugs", BUGS.md, DECISIONS.md | "The gate runs with retries 0. Self-healing is logged in regular CI and fails the gate. The 5 runs are independent jobs on one commit. We test only our own workspace. Known product issues are in BUGS.md with their Spira IDs. Every decision is in DECISIONS.md, and every prompt is in PROMPTS.md." |
+| 3:30-3:50 | Close | README links | "The repo, the gate run, the STP, the bugs and the fixes are all linked in the README." |

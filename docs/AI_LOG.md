@@ -7,14 +7,25 @@
 Claude Code (Lead session + subagents in `.claude/agents/`), Playwright MCP, Playwright test agents (planner/generator/healer), `anthropics/claude-code-action` in triage.yml, direct Messages API fallback (`triage/claude-diagnose.ts`).
 
 ## What AI created or changed (per folder)
-| Folder | Created / changed by | Reviewed by Kayla (commit) |
+| Folder | Created / changed by | Reviewed and merged (PR) |
 |---|---|---|
-| | | |
+| docs/BASELINE.md, docs/TEST_PLAN.json | recon agent | #29 |
+| docs/product/ | Claude subagents reading the public docs (Session 1) | 37290db (direct, pre-lanes); AT_A_GLANCE in #30 |
+| tests/e2e/auth/, tests/e2e/modules/, src/pages/, src/components/ | stabilizer-ui agent | #37, #44 |
+| tests/api/legacy-api/ (was tests/api/existing/) | stabilizer-api agent | #32 |
+| tests/api/*.spec.ts, src/api/ | api agent | #36 |
+| tests/e2e/dealbook/ | crawler-generator agent | #31 |
+| src/config/env.ts, eslint.config.mjs, .env.example | architect agent | #35 |
+| docs/REVIEW_CHECKLIST.md, scripts/pre-pr.mjs, .claude/hooks/pr-gate.mjs | Lead session | #38 |
+| docs/PROMPTS.md | Lead session (`scripts/export-prompts.mjs`) | #43 |
+| docs/STP.md, docs/TEST_PLAN.md, docs/VIDEO_SCRIPT.md, docs/FIXES.md summary, README.md | scribe agent | this PR (agent/scribe) |
 
 ## AI-generated tests promoted (human-reviewed)
 | Test | Origin (crawler / Claude) | Promotion PR | Reviewing commit |
 |---|---|---|---|
-| | | | |
+| T01 tests/e2e/dealbook/dealbook.filter-sector.spec.ts | crawler-generator (Claude Opus 5.5, aria snapshot + `/deals/list` XHR probe), 10/10 at 1 and 4 workers | #31 | 7f0beae (R1-R19 review fixes) |
+| T02 open a deal (briefing, key facts, view at source) | crawler-generator | #41 (open) | |
+| T03 Deal Book Export .xlsx | crawler-generator | #42 (open) | |
 
 ## Key prompts
 ### Session 1: setup and product study (Claude Code, model Claude Opus 5.5, 17:30-18:10, run outside this repo so the hook did not log it)
@@ -28,9 +39,16 @@ Claude Code (Lead session + subagents in `.claude/agents/`), Playwright MCP, Pla
 8. Opening-briefing transcript: rules and Luca's walkthrough added to `JUDGES_FOCUS.md`.
 
 ## Reviewed and rejected
-| What AI proposed | Why Kayla rejected it |
-|---|---|
-| | |
+| What AI proposed or did | Why it was rejected | Source |
+|---|---|---|
+| Lower lint to `LINT_LEVEL=warn` to get the legacy specs green | Would only hide new problems; kept `error` + `--max-warnings=0` and ignored the two legacy paths until moved | D16 |
+| Let the healer fall back to CSS for the "Sign in" button | The role locator also matched "Email me a link to sign in instead"; fixed with an exact name match instead of accepting the heal | F10 |
+| Run the suite with the credentials committed in the repo | They were the judges' Judge 2 account; switched to our own Finalist 4 workspace | F9, D15 |
+| Wrong-password test signing in as the shared TEST_USER | 20+ failed sign-ins per pre-pr run could lock the account every test uses; uses a RUN_ID email with no account | F21 |
+| A second, generated DealBookPage in tests/generated/ | Duplicate page object; its Deals-tab alternate made the selected-tab assertion tautological; merged into one | F22 |
+| Isolating the logout test in its own user (suspected session revocation) | Checked first: logout x5 in parallel with other UI tests stayed green, sign-out is per session; no change needed | F23 |
+| Treating the 3 C1 API failures as product bugs | Docs and API agree on all three; the tests were wrong | FA3-FA5, CHANGELOG [stabilizer-api] |
+| Let Claude in CI push fixes | Claude only diagnoses and proposes (`ai-fix/*` PR); a human merges | D6 |
 
 ## Prompt log (auto-appended)
 
