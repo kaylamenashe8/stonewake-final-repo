@@ -17,6 +17,15 @@ only the parts its team uses.
 | 9 | API and MCP | API and MCP server documented at docs.stonewake.ai. Admins create API keys in Settings. **Connected assistants** lists every assistant allowed to read the workspace (always read-only) and can end its access. | docs.stonewake.ai, Settings |
 | 10 | Settings | Workspace, team and role, alert mail and dashboard alerts, Connected assistants. Admins also: Members, API keys, Single sign on, Sign in and directory, Audit log (CSV download). | Click the workspace name at the bottom of the sidebar |
 
+## Update 19:02 (Luca): social monitoring
+- **Monitoring** in the sidebar now has two tabs: **Research** and **Sentiment**. Refresh the page once to see them.
+- **Monitor a name** (top right) adds a company, person, brand or topic.
+- **Sentiment** shows what public posts say about each monitored name. Every row can be **paused** or **removed** in place.
+- Posts for a newly added name appear only **after its next reading**: assert the row and its state, not posts (D18).
+- Test data: add a RUN_ID-prefixed name and remove it in the same test.
+
+Security testing is allowed (Luca 18:18), inside our own workspace and without DoS or cross-workspace probing (D17).
+
 Help: competition WhatsApp group, **How it works** at the bottom of the sidebar, docs.stonewake.ai.
 
 ## What this adds to DEMO_VIDEO.md and the notes (testing impact)
