@@ -14,19 +14,21 @@ This is the test automation project for **Stonewake**, our product. It contains 
 ### Before -> after
 | Metric | Before (`b4f92c9`, [BASELINE.md](docs/BASELINE.md)) | After |
 |---|---|---|
-| Tests | 20 (10 UI, 10 API) | The 20 baseline tests (moved, none removed) + plan items T01, T02, T03, T08, T10, T15, T16, T17, T18, T20, T21 ([TEST_PLAN.md](docs/TEST_PLAN.md)) |
-| Passing, 5 runs, retries 0, 4 workers | 10/20 pass 5/5; 10 fail 0/5; 0 flaky | Pending: final Stability Gate (20:20-20:40) |
+| Tests | 20 (10 UI, 10 API) | The 20 baseline tests (moved, none removed) + plan items T01, T02, T03, T08, T10, T15, T16, T17, T18, T19, T20, T21 ([TEST_PLAN.md](docs/TEST_PLAN.md)); 87 tests in the gate |
+| Passing, 5 runs, retries 0 | 10/20 pass 5/5; 10 fail 0/5; 0 flaky | **87/87 pass 5/5; 0 failed; 0 flaky; 0 heals** (final gate) |
 | Lint | 177 errors, 54 warnings | 0 errors, `--max-warnings=0` (D16, enforced by `npm run pre-pr` on every PR) |
 | Hard waits | 3 `waitForTimeout` | 0 (F5, F18) |
 | XPath selectors | 18 | 0 (F6, F19) |
 | Hardcoded absolute URLs | 67 | 0, `baseURL` / `API_URL` from env (F7, F20, FA7) |
 | Secrets in code | 3 literals + committed `.env` | 0 (F1, F2, FA6) |
 | Automation faults fixed | n/a | 32, by category in [FIXES.md](docs/FIXES.md) |
-| Suite time | ~33 s per pass (166.6 s for 100 runs, 4 workers) | Pending: final Stability Gate |
+| Suite time | ~33 s per pass (166.6 s for 100 runs, 4 workers) | ~43 s per gate run for 87 tests (run-1: 42.5 s) |
 
 ### Stability Gate
 - Rules: 5 independent full-suite runs of one commit, retries 0, `HEAL_MODE=strict` (any self-heal fails the run) (D2, D3, D5).
-- Latest gate run: [41877426539](https://github.com/kaylamenashe8/stonewake-final-repo/actions/runs/41877426539), **failed** (on `e745779`: UI migration #37 merged, API migration #32, #36 and UI review fixes #44 not yet). The final run link and its 5/5 result go here at 20:20-20:40.
+- **Final gate: [41886884031](https://github.com/kaylamenashe8/stonewake-final-repo/actions/runs/41886884031), 5/5 green** on `0278066` (master at code freeze, with T19): 87 passed per run, 0 failed, 0 flaky, retries 0, 0 heals.
+- Earlier gate: [41877426539](https://github.com/kaylamenashe8/stonewake-final-repo/actions/runs/41877426539) (19:25) failed 5/5 on the 5 legacy API tests, before the API migration (#32) and the key in CI (#46) were merged.
+- The plan this was built from: [PRD.md](docs/PRD.md).
 - HTML report: [latest run](https://kaylamenashe8.github.io/stonewake-final-repo/latest/) · history of every run and gate: [Pages index](https://kaylamenashe8.github.io/stonewake-final-repo/) (GitHub Pages, published by ci.yml).
 
 ### Slack notifications
