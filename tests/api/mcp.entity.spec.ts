@@ -7,6 +7,7 @@ import { InstitutionSchema, McpErrorSchema, McpToolListSchema } from '../../src/
 
 // T21 (#21), REQ-API-06. MCP and REST share one data model: the same registry entity must read identically.
 const MISSING_CREDENTIAL = -32001;
+const ANY_ENTITY_ID = 1; // never read: the call is refused before the tool runs
 
 test.describe('MCP entity parity @api', () => {
   test('should return the same institution through MCP company_profile as through REST when both read one id', async ({
@@ -42,7 +43,10 @@ test.describe('MCP entity parity @api', () => {
 
   test('should refuse a tool call with JSON-RPC error -32001 when no key is sent', async ({ api }) => {
     requirement('REQ-API-06');
-    const res = await mcpRequest(api, 'tools/call', { name: 'company_profile', arguments: { entity_id: 1 } });
+    const res = await mcpRequest(api, 'tools/call', {
+      name: 'company_profile',
+      arguments: { entity_id: ANY_ENTITY_ID },
+    });
 
     // HTTP status is not pinned: docs say 200 for -32001, live answers 401 (open question, docs/API_MAP.md).
     expect(McpErrorSchema.parse(res.body).error.code).toBe(MISSING_CREDENTIAL);
