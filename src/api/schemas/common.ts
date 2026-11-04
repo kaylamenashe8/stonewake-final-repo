@@ -30,3 +30,13 @@ export const NOT_FOUND = { error: { code: 'not_found', message: 'Resource not fo
 export const UNAUTHENTICATED = {
   error: { code: 'unauthenticated', message: 'Missing or invalid credentials.' },
 } as const;
+
+/** `/org/*` (dashboard-session routes) refusals add a top-level `detail` string to the envelope. */
+export const OrgErrorEnvelope = z.strictObject({
+  error: z.strictObject({ code: z.string().min(1), message: z.string().min(1) }),
+  detail: z.string().min(1),
+});
+
+export const METHOD_NOT_ALLOWED = {
+  error: { code: 'method_not_allowed', message: 'Method not allowed.' },
+} as const;
