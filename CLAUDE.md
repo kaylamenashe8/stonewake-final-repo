@@ -10,8 +10,11 @@ Stability Gate (retries 0, zero heals), with every decision documented.
   `docs/CHANGELOG.md` entry; the Lead applies them.
 - One worktree per agent: `git worktree add ../wt-<agent> -b agent/<agent>`. Never push to main. Lead merges.
 - Merge order: Architect → Stabilizer → CI/Infra → Coverage → Visual/Bonus → Triage. Scribe, Bug Reporter any time.
-- Before asking for review: rebase on main, run 2-3 self code reviews, `npm run verify` green, and for any
-  new test `npm run test:10x -- <file>` passes 10/10 (also with `--workers=4`).
+- **Nothing is pushed to a PR until it is reviewed and passes E2E** (enforced by `.claude/hooks/pr-gate.mjs`).
+  Before every push: rebase on master; review your own diff against `docs/REVIEW_CHECKLIST.md` (TS, Playwright and
+  general best practice) in 2+ full passes as a strict senior reviewer, fix everything found, tick R1-R19 in
+  `.agents/review/<branch>.md`; then `npm run pre-pr` (lint, typecheck, changed specs 10/10 on 1 and 4 workers,
+  @smoke, migrated suite when shared code changed) must pass on HEAD. Paste its Self-review/E2E blocks into the PR.
 - Existing tests are never removed. A product-bug failure is skipped with `knownBug('SPIRA-<id>', title, url)`.
   A new test that cannot reach 10/10 is not added.
 - No test starts after 20:00. Code freeze 20:20.
