@@ -1,4 +1,4 @@
-import type { Locator, Page, Response } from '@playwright/test';
+import type { Download, Locator, Page, Response } from '@playwright/test';
 import { BasePage } from '../../../src/pages/BasePage';
 import { by, element } from '../../../src/pages/spec';
 
@@ -18,6 +18,8 @@ export class DealBookPage extends BasePage {
     by.label('All sectors'),
     by.role('combobox', 'All sectors'),
   );
+
+  readonly exportButton = element('Deal Book > Export', by.role('button', 'Export'));
 
   readonly dealsTable = element(
     'Deal Book > Deals table',
@@ -80,6 +82,14 @@ export class DealBookPage extends BasePage {
     if (!name || !sector) throw new Error(`Deal Book: cannot read name and sector from "${lines.join(' | ')}"`);
     await link.click();
     return { name, sector };
+  }
+
+  /** Clicks Export (POST /deals/excel) and returns the browser download. */
+  async exportDeals(): Promise<Download> {
+    const button = await this.el(this.exportButton);
+    const download = this.page.waitForEvent('download');
+    await button.click();
+    return download;
   }
 
   private async dealsTotal(action: () => Promise<void>, urlPart = ''): Promise<number> {

@@ -1,4 +1,4 @@
-import type { Locator, Page } from '@playwright/test';
+import type { Download, Locator, Page } from '@playwright/test';
 import { BasePage } from '../../../src/pages/BasePage';
 import { by, element } from '../../../src/pages/spec';
 
@@ -27,6 +27,8 @@ export class DealPage extends BasePage {
     // first(): every update has its own "N sources" button; any one proves the citation drawer.
     build: (p: Page) => p.getByRole('button', { name: /^\d+ sources?$/ }).first(),
   });
+
+  readonly downloadReportButton = element('Deal > Download report', by.role('button', 'Download report'));
 
   readonly sourceDrawer = element('Deal > Source drawer', {
     strategy: 'role',
@@ -70,5 +72,13 @@ export class DealPage extends BasePage {
     await (await this.el(this.firstSourcesButton)).click();
     const drawer = await this.el(this.sourceDrawer);
     return drawer.getByRole('link', { name: /^view at source/i });
+  }
+
+  /** Clicks Download report (GET /deals/:id/report) and returns the browser download. */
+  async downloadReport(): Promise<Download> {
+    const button = await this.el(this.downloadReportButton);
+    const download = this.page.waitForEvent('download');
+    await button.click();
+    return download;
   }
 }
