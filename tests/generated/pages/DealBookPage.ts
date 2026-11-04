@@ -1,4 +1,5 @@
 import type { Locator, Page, Response } from '@playwright/test';
+import { z } from 'zod';
 import { BasePage } from '../../../src/pages/BasePage';
 import { by, element } from '../../../src/pages/spec';
 
@@ -6,6 +7,21 @@ import { by, element } from '../../../src/pages/spec';
 export const DEAL_PAGE_SIZE = 50;
 
 const DEALS_LIST = /\/deals\/list(\?|$)/;
+
+/** Only the field the page object reads from POST /deals/list; the full contract is the API lane's. */
+const dealsListTotal = z.object({ total: z.number().int().nonnegative() });
+
+/** Separator in the line under a deal name: "Country · Sector" (country may be missing). */
+const SUBTITLE_SEPARATOR = ' · ';
+
+/** Name and sector from a deal link's text: ["New",] name, "Country · Sector" (one per line). */
+export function dealLinkParts(text: string): { name: string; sector: string } {
+  const lines = text.trim().split('\n');
+  return {
+    name: lines.at(-2)?.trim() ?? '',
+    sector: lines.at(-1)?.split(SUBTITLE_SEPARATOR).at(-1)?.trim() ?? '',
+  };
+}
 
 /** Deal Book (sidebar > Deal Book, path "/"). Filters drive POST /deals/list and the ?sector= query. */
 export class DealBookPage extends BasePage {
@@ -59,10 +75,7 @@ export class DealBookPage extends BasePage {
   async visibleDealSectors(): Promise<string[]> {
     const links = (await this.dealRows()).getByRole('link');
     const texts = await links.allInnerTexts();
-    return texts.map((t) => {
-      const subtitle = t.trim().split('\n').at(-1) ?? '';
-      return subtitle.split(' · ').at(-1)?.trim() ?? '';
-    });
+    return texts.map((t) => dealLinkParts(t).sector);
   }
 
   /** Sector of the first deal in the list: the test picks its filter from live data, not a hardcoded value. */
@@ -74,13 +87,13 @@ export class DealBookPage extends BasePage {
     return first;
   }
 
+  // Not BasePage.actAndWaitFor: the caller needs the response body (total), not just the wait.
   private async dealsTotal(action: () => Promise<void>, urlPart = ''): Promise<number> {
     const response = this.page.waitForResponse(
-      (r: Response) => r.request().method() === 'POST' && DEALS_LIST.test(r.url()) && r.url().includes(urlPart),
+      (r: Response) =>
+        r.request().method() === 'POST' && DEALS_LIST.test(r.url()) && r.url().includes(urlPart),
     );
     await action();
-    const body = (await (await response).json()) as { total?: unknown };
-    if (typeof body.total !== 'number') throw new Error('Deal Book: /deals/list response has no numeric total');
-    return body.total;
+    return dealsListTotal.parse(await (await response).json()).total;
   }
 }
