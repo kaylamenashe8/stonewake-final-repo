@@ -38,7 +38,8 @@ export const by = {
 
 /** element('Login > Submit', by.role('button', 'Login'), by.testId('login-button')) */
 export function element(name: string, primary: Alternate, ...alternates: Alternate[]): ElementSpec {
-  const role = primary.strategy === 'role' ? /getByRole\('([^']+)', \{ name: (.+) \}\)/.exec(primary.describe) : null;
+  const role =
+    primary.strategy === 'role' ? /getByRole\('([^']+)', \{ name: (.+) \}\)/.exec(primary.describe) : null;
   return {
     element: name,
     primary: primary.build,
