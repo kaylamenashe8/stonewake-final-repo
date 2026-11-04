@@ -1,6 +1,6 @@
 import { test, expect } from '../../../src/fixtures';
 import { aiGenerated, requirement } from '../../../src/utils/annotations';
-import { DealBookPage } from '../../generated/pages/DealBookPage';
+import { DealBookFlows } from '../../generated/pages/DealBookFlows';
 import { DealPage } from '../../generated/pages/DealPage';
 
 test.describe('Deal Book deal detail @regression', () => {
@@ -9,7 +9,7 @@ test.describe('Deal Book deal detail @regression', () => {
   }) => {
     requirement('T02');
     aiGenerated('a6ed91c');
-    const dealBook = new DealBookPage(page);
+    const dealBook = new DealBookFlows(page);
     const deal = new DealPage(page);
 
     const listed = await test.step('open the first deal from the Deal Book', async () => {

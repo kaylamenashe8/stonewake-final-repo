@@ -6,6 +6,7 @@ Read in this order:
 3. `notes-A.md`: authentication, API keys, every /v1 endpoint and the 38 MCP tools, with UI/API/MCP parity test ideas per flow.
 4. `notes-C.md`: errors and rate limits, security, roles and SSO, accessibility (WCAG 2.1 AA), changelog (bug-prone areas), terms of use.
 5. `DEMO_VIDEO.md`: screen-by-screen map of the UI from the demo video (sidebar, filters, columns, buttons per flow).
+6. `AT_A_GLANCE.md`: the organizers' one-page map of the 10 dashboard areas (adds Tenders, Institutions, Settings, export formats) and the testable rules it states.
 
 Source: the public docs (docs.stonewake.ai, llms-full.txt) and site, read on 2026-11-04 as background only. They are not a test target.
 
