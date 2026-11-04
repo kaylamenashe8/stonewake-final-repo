@@ -31,7 +31,7 @@ This is the test automation project for **Stonewake**, our product. It contains 
 
 ### Slack notifications
 - CI (`ci.yml`) and the triage ladder (`triage.yml`) post each run's result and the triage verdicts to a Slack channel through an Incoming Webhook (D10).
-- Judges who want to see the channel: contact Kayla ([GitHub @kaylamenashe8](https://github.com/kaylamenashe8)) and she will add you to the Slack workspace.
+- Judges who want to see the channel: email Kayla at [kaylamenashe@gmail.com](mailto:kaylamenashe@gmail.com) and she will add you to the Slack workspace.
 
 ### Known product bugs
 Recorded in [BUGS.md](docs/BUGS.md) (system of record: SpiraTest, D10).
