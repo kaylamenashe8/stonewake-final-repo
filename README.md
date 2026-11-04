@@ -14,7 +14,7 @@ This is the test automation project for **Stonewake**, our product. It contains 
 ### Before -> after
 | Metric | Before (`b4f92c9`, [BASELINE.md](docs/BASELINE.md)) | After |
 |---|---|---|
-| Tests | 20 (10 UI, 10 API) | The 20 baseline tests (moved, none removed) + plan items T01, T16, T17, T18, T20, T21 ([TEST_PLAN.md](docs/TEST_PLAN.md)) |
+| Tests | 20 (10 UI, 10 API) | The 20 baseline tests (moved, none removed) + plan items T01, T10, T15, T16, T17, T18, T20, T21 ([TEST_PLAN.md](docs/TEST_PLAN.md)) |
 | Passing, 5 runs, retries 0, 4 workers | 10/20 pass 5/5; 10 fail 0/5; 0 flaky | Pending: final Stability Gate (20:20-20:40) |
 | Lint | 177 errors, 54 warnings | 0 errors, `--max-warnings=0` (D16, enforced by `npm run pre-pr` on every PR) |
 | Hard waits | 3 `waitForTimeout` | 0 (F5, F18) |
@@ -30,7 +30,13 @@ This is the test automation project for **Stonewake**, our product. It contains 
 - HTML report and history: GitHub Pages is not enabled on this repo yet; each CI run uploads the Playwright HTML report as an artifact.
 
 ### Known product bugs
-Recorded in [BUGS.md](docs/BUGS.md) (system of record: SpiraTest, D10). None of the 10 baseline failures was a product bug: all were automation faults ([FIXES.md](docs/FIXES.md)).
+Recorded in [BUGS.md](docs/BUGS.md) (system of record: SpiraTest, D10).
+
+| Spira | Bug | Severity | Test |
+|---|---|---|---|
+| [SPIRA-89](https://itac.spiraservice.net/33/Incident/89.aspx) | MCP: tool call without credential answers HTTP 401, docs say HTTP 200 for -32001 | low | tests/api/mcp.entity.spec.ts (knownBug test in PR #51) |
+
+None of the 10 baseline failures was a product bug: all were automation faults ([FIXES.md](docs/FIXES.md)).
 
 ### Documents
 - [Software Test Plan (STP)](docs/STP.md): scope, risks, traceability, entry/exit criteria

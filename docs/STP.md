@@ -29,8 +29,8 @@ Source: [BASELINE.md](BASELINE.md#product-profile).
 | R2 | F1 Deal Book: filter, open, export | 5 | 3 | 15 | P1 | T01 (merged), T02, T03 (open PRs) |
 | R3 | F6 API/MCP contracts and auth scheme | 4 | 4 | 16 | P1 | T16-T18, T20, T21, tests/api/legacy-api/* |
 | R4 | F2 Screenings: verdict cites sources, person never rated | 5 | 2 | 10 | P1 | T05, T06 (not started) |
-| R5 | F5 Monitoring/Portfolio incl. Sentiment (new on the day) | 4 | 4 | 16 | P1 | T13, T15, T30, T31 (not started); ui 10 portfolio |
-| R6 | F3 Network / F4 Countries: sourced data | 4 | 2 | 8 | P1 | T08, T10 (not started); ui 8, ui 9 |
+| R5 | F5 Monitoring/Portfolio incl. Sentiment (new on the day) | 4 | 4 | 16 | P1 | T15 (merged); T13, T30, T31 (not started); ui 10 portfolio |
+| R6 | F3 Network / F4 Countries: sourced data | 4 | 2 | 8 | P1 | T10 (merged), T08 (open PR); ui 8, ui 9 |
 | R7 | Security: XSS in inputs, key/role enforcement, cookies | 5 | 2 | 10 | P2 | T32-T34 (not started) |
 | R8 | Shared live workspace: data changes under the tests | 3 | 4 | 12 | - | Design rule: no live values asserted (FA8, F15, F17) |
 
@@ -68,8 +68,11 @@ Risk = impact x likelihood. Impact from JUDGES_FOCUS (six flows); likelihood fro
 | REQ-API-02 | T17 deals list/detail/sort contract | R3 | tests/api/deals.{list,detail}.spec.ts | merged (PR #36) | none |
 | REQ-API-03 | T18 screenings, network, ownership | R3 | tests/api/{screenings.list,network.get,ownership.get}.spec.ts | merged (PR #36) | none |
 | REQ-API-05 | T20 422 envelope, rate-limit headers | R3 | tests/api/{deals.filters,ratelimit.headers}.spec.ts | merged (PR #36) | none |
-| REQ-API-06 | T21 MCP entity equals REST | R3 | tests/api/mcp.entity.spec.ts | merged (PR #36) | MCP 401-vs-200 draft (PR #45, [BUGS.md](BUGS.md)) |
-| REQ-SCR-01/02, REQ-NET-01, REQ-CTY-01, REQ-MON-01/03/04, REQ-POR-01, REQ-API-04 | Remaining P1 items | R4-R6 | none | not started | none |
+| REQ-API-06 | T21 MCP entity equals REST | R3 | tests/api/mcp.entity.spec.ts | merged (PR #36); knownBug test in PR #51 | [SPIRA-89](https://itac.spiraservice.net/33/Incident/89.aspx) (PR #45) |
+| REQ-CTY-01 | T10 country risk score and cited indicators | R6 | tests/e2e/countries/country-profile.risk-score.spec.ts | merged (PR #48) | none |
+| REQ-POR-01 | T15 Portfolio tiles equal /v1/portfolio/summary | R5 | tests/e2e/portfolio/portfolio.status-tiles.spec.ts | merged (PR #49) | none |
+| REQ-NET-01 | T08 company lookup: officers, cited relationships | R6 | in PR #52 | open PR | none |
+| REQ-SCR-01/02, REQ-MON-01/03/04, REQ-API-04 | Remaining P1 items | R4, R5 | none | not started | none |
 | REQ-SEC-01..03 | T32-T34 security | R7 | none | not started | none |
 
 All other P2/P3 requirements: not started; full list with issue links in [TEST_PLAN.md](TEST_PLAN.md).
@@ -93,13 +96,13 @@ ci.yml (lint, typecheck, 4 shards, Pages, Slack, triage) · stability-gate.yml (
 | ToS 4(j) limits automated UI access | Competition workspace is the agreed target; API/MCP used where possible | Open question to judges (BASELINE) |
 | API key in traces (`Authorization` header) | REQUEST to the Architect: `trace: 'off'` for the `api` project (CHANGELOG) | Requested |
 | GitHub Pages not configured (API returns 404) | HTML report as CI artifact | Open |
-| Most P1 UI flows not automated (9 of 15 P1 items not started at export) | Ranked plan; baseline suite stabilized first | Disclosed in TEST_PLAN.md |
+| Most P1 UI flows not automated (6 of 15 P1 items not started at 20:10) | Ranked plan; baseline suite stabilized first | Disclosed in TEST_PLAN.md |
 
 ## 11. Schedule as executed
 | Planned | Actual | Phase | Notes |
 |---|---|---|---|
 | 18:00-18:20 | 18:06-18:20 | Recon | BASELINE measured on `b4f92c9`; plan T01-T27 (PR #29) |
 | 18:20-19:50 | 18:20-19:50 | Parallel lanes | Merged: #31 T01, #32 API migration, #35 env/lint, #36 API T16-T21, #37/#44 UI migration, #38 pre-PR gate; judge updates D17/D18 added T28-T34 (#30) |
-| 19:50-20:20 | | Integrate | Open at 19:50: #41 T02, #42 T03, #45 bug draft |
+| 19:50-20:20 | 19:50- | Integrate | Merged #48 T10, #49 T15, #50 Spira env; open: #41 T02, #42 T03, #45 SPIRA-89, #46 CI Pages, #47 triage, #51 SPIRA-89 test, #52 T08 |
 | 20:20-20:40 | | Freeze + final gate | |
 | 20:40-20:55 | | Wrap-up | |
