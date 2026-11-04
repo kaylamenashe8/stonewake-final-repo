@@ -1,6 +1,6 @@
 import { test, expect } from '../../../src/fixtures';
 import { aiGenerated, requirement } from '../../../src/utils/annotations';
-import { DEAL_PAGE_SIZE, DealBookPage } from '../../generated/pages/DealBookPage';
+import { DEAL_PAGE_SIZE, DealBookPage } from '../../../src/pages/DealBookPage';
 
 test.describe('Deal Book sector filter @regression', () => {
   test('should list only deals of the chosen sector when a sector filter is applied', async ({ page }) => {
@@ -27,7 +27,7 @@ test.describe('Deal Book sector filter @regression', () => {
           message: `every row is ${sector}`,
         })
         .toEqual([sector]);
-      await expect(await dealBook.dealRows()).toHaveCount(Math.min(filteredTotal, DEAL_PAGE_SIZE));
+      await expect(dealBook.dealRows()).toHaveCount(Math.min(filteredTotal, DEAL_PAGE_SIZE));
     });
   });
 });

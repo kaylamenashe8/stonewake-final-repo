@@ -1,6 +1,6 @@
 import { test, expect } from '../../src/fixtures';
 import { requirement } from '../../src/utils/annotations';
-import { DealBookPage } from './pages/DealBookPage';
+import { DealBookFlows } from './pages/DealBookFlows';
 import { DealPage } from './pages/DealPage';
 import { MIN_EXPORT_BYTES, savedFile } from './pages/downloads';
 
@@ -9,7 +9,7 @@ test.describe('Deal report PDF @regression', () => {
     page,
   }) => {
     requirement('T03');
-    const dealBook = new DealBookPage(page);
+    const dealBook = new DealBookFlows(page);
     await dealBook.open();
     const listed = await dealBook.openFirstDeal();
     const deal = new DealPage(page);
