@@ -1,4 +1,6 @@
+import type { Download } from '@playwright/test';
 import { DealBookPage } from '../../../src/pages/DealBookPage';
+import { by, element } from '../../../src/pages/spec';
 
 /** Separator in the line under a deal name: "Country · Sector" (country may be missing). */
 const SUBTITLE_SEPARATOR = ' · ';
@@ -17,6 +19,16 @@ export function dealLinkParts(text: string): { name: string; sector: string } {
  * CHANGELOG REQUEST: fold these methods into src/pages/DealBookPage.
  */
 export class DealBookFlows extends DealBookPage {
+  readonly exportButton = element('Deal Book > Export', by.role('button', 'Export'));
+
+  /** Clicks Export (POST /deals/excel) and returns the browser download. */
+  async exportDeals(): Promise<Download> {
+    const button = await this.el(this.exportButton);
+    const download = this.page.waitForEvent('download');
+    await button.click();
+    return download;
+  }
+
   /** Opens the first listed deal (client-side route to /deals/:id); returns the name and sector the list showed. */
   async openFirstDeal(): Promise<{ name: string; sector: string }> {
     // first(): the test takes whichever deal ranks first today instead of a hardcoded id.
