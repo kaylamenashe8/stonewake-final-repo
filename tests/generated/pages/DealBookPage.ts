@@ -15,8 +15,8 @@ export class DealBookPage extends BasePage {
 
   readonly sectorFilter = element(
     'Deal Book > Sector filter',
-    by.label('All sectors'),
     by.role('combobox', 'All sectors'),
+    by.label('All sectors'),
   );
 
   readonly dealsTable = element(
@@ -46,7 +46,10 @@ export class DealBookPage extends BasePage {
     }, 'sector=');
   }
 
-  /** Deal rows (the header row has no link, so it is excluded). */
+  /**
+   * Deal rows (the header row has no link, so it is excluded). A collection, so it is derived from the
+   * dealsTable ElementSpec instead of being its own spec (the healer resolves single elements only).
+   */
   async dealRows(): Promise<Locator> {
     const table = await this.el(this.dealsTable);
     return table.getByRole('row').filter({ has: this.page.getByRole('link') });
@@ -64,6 +67,7 @@ export class DealBookPage extends BasePage {
 
   /** Sector of the first deal in the list: the test picks its filter from live data, not a hardcoded value. */
   async firstDealSector(): Promise<string> {
+    // first(): readiness only, waits until at least one deal row has rendered.
     await (await this.dealRows()).first().waitFor();
     const [first] = await this.visibleDealSectors();
     if (!first) throw new Error('Deal Book: first deal row has no sector');
