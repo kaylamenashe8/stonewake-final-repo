@@ -1,7 +1,7 @@
-import { test, expect } from '../../src/fixtures';
-import { requirement } from '../../src/utils/annotations';
-import { PORTFOLIO_TILE_STATUSES, PortfolioPage } from './pages/PortfolioPage';
-import { fetchPortfolioSummary } from './pages/portfolioApi';
+import { test, expect } from '../../../src/fixtures';
+import { aiGenerated, requirement } from '../../../src/utils/annotations';
+import { PORTFOLIO_TILE_STATUSES, PortfolioPage } from '../../generated/pages/PortfolioPage';
+import { fetchPortfolioSummary } from '../../generated/pages/portfolioApi';
 
 test.describe('Portfolio status tiles @regression', () => {
   test('should show the same status counts as the API portfolio summary when Portfolio is opened', async ({
@@ -9,6 +9,7 @@ test.describe('Portfolio status tiles @regression', () => {
     api,
   }) => {
     requirement('T15');
+    aiGenerated('5c24557');
     const portfolio = new PortfolioPage(page);
 
     const summary = await test.step('read GET /v1/portfolio/summary', async () => {
