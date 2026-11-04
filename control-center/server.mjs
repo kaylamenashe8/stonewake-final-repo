@@ -9,6 +9,7 @@ import { execFile } from 'node:child_process';
 import { readFileSync, readdirSync, existsSync, writeFileSync, appendFileSync, mkdirSync, statSync } from 'node:fs';
 import { join, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { sessions as readSessions, gaps as findGaps } from './gaps.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = process.env.REPO_ROOT ?? join(HERE, '..');
@@ -322,7 +323,7 @@ async function state() {
   }
 
   const bugs = parseBugs();
-  return {
+  const out = {
     repo: r,
     gh: r ? `https://github.com/${r}` : '',
     pages: r ? `https://${r.split('/')[0]}.github.io/${r.split('/')[1]}` : '',
@@ -338,6 +339,11 @@ async function state() {
     errors,
     at: new Date().toISOString(),
   };
+  // Running Claude Code sessions/subagents (incl. ones with no status file) and the gaps the Lead must act on
+  const sess = await safe('sessions', async () => readSessions(ROOT), []);
+  out.sessions = sess.filter((x) => x.active).map(({ lastMs, ...x }) => x);
+  out.gaps = findGaps(out, sess);
+  return out;
 }
 
 // ---------- actions ----------
