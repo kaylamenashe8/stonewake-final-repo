@@ -4,7 +4,7 @@
 
 | Spira ID | Title | Severity | Found by | Jam | Linked test | Status |
 |---|---|---|---|---|---|---|
-| DRAFT-02 | MCP: tool call without credential answers HTTP 401, docs say HTTP 200 for -32001 | low | exploratory (API lane) | [Jam](https://jam.dev/c/d4f29d0e-151d-4d65-9ffc-0f5f65010ea8) | tests/api/mcp.entity.spec.ts | review |
+| [SPIRA-89](https://itac.spiraservice.net/33/Incident/89.aspx) | MCP: tool call without credential answers HTTP 401, docs say HTTP 200 for -32001 | low | exploratory (API lane) | [Jam](https://jam.dev/c/d4f29d0e-151d-4d65-9ffc-0f5f65010ea8) | tests/api/mcp.entity.spec.ts | filed |
 
 ## Drafts
 
@@ -26,7 +26,7 @@
 - Linked test: tests/e2e/<feature>/<file>.spec.ts
 - Spira: pending
 
-### DRAFT-02: MCP: tool call without credential answers HTTP 401, docs say HTTP 200 for -32001
+### SPIRA-89 (was DRAFT-02): MCP: tool call without credential answers HTTP 401, docs say HTTP 200 for -32001
 - Environment: https://mcp.stonewake.ai/ (JSON-RPC over HTTP; curl and Chromium via Playwright), 2026-11-04 17:39 and 17:47 UTC, commit 7edc10b
 - Preconditions: none (no API key is sent)
 - Steps:
@@ -39,12 +39,11 @@
 - Severity: low
 - Priority: P3
 - Jam: https://jam.dev/c/d4f29d0e-151d-4d65-9ffc-0f5f65010ea8
-- Screenshot: test-results/bug-repro/mcp-status-should-answer-H-2e5ac--MCP-tool-call-sends-no-key/test-failed-1.png
 - Repro run: chromium, Playwright 1.64.1, retries 0, trace + video on, 2026-11-04 17:47 UTC, commit 7edc10b. Expected 200, received 401.
 - Evidence notes: the Jam holds the video and Playwright trace; its network tab shows `POST 401 https://mcp.stonewake.ai/`. Its one console error is a CSP notice from the docs page and is unrelated.
 - Linked test: tests/api/mcp.entity.spec.ts
-- Linked test plan: the API lane adds "should answer HTTP 200 with JSON-RPC -32001 when a tool call sends no key" to that file, skipped with the `knownBug(...)` line once the Spira ID exists. The existing -32001 test stays green because it does not pin the status.
-- Spira: pending (awaiting Kayla's approval)
+- Known-bug handling: no `knownBug(...)` skip in tests/api/mcp.entity.spec.ts. Its -32001 test asserts only the JSON-RPC code and passes, so skipping it would lose coverage. API-only bug, no screenshot attached in Spira.
+- Spira: [SPIRA-89](https://itac.spiraservice.net/33/Incident/89.aspx)
 
 ## Reviewed, not filed
 
