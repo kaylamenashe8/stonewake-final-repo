@@ -1,0 +1,144 @@
+# CI: quality → test (4 shards, retries 1, heals logged) → report (summary, Pages, Slack) → triage on failure.
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  quality:
+    name: quality (lint, typecheck, versions)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    env:
+      HOME: /root
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+      - run: npm ci --no-audit --no-fund
+      - name: Version check (Docker image tag == @playwright/test)
+        run: bash scripts/version-check.sh
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+
+  test:
+    name: test
+    needs: quality
+    uses: ./.github/workflows/run-suite.yml
+    with:
+      run_label: ci
+      retries: 1
+      heal_mode: log
+      shard_total: 4
+    secrets: inherit
+
+  report:
+    name: report (summary, Pages, Slack)
+    needs: test
+    if: ${{ always() && !cancelled() && needs.test.result != 'skipped' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+    env:
+      PUBLISH: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch' }}
+      PAGES_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+
+      - name: Download results
+        uses: actions/download-artifact@v4
+        with:
+          name: results-ci
+          path: results
+      - name: Download HTML report
+        uses: actions/download-artifact@v4
+        with:
+          name: report-ci
+          path: html
+
+      - name: Job summary
+        run: >
+          npx tsx scripts/run-summary.ts --title "CI run"
+          --results results/results.json --heals results/heal-report.json
+          ${{ env.PUBLISH == 'true' && format('--report-url {0}/runs/{1}/', env.PAGES_URL, github.run_id) || '' }}
+
+      - name: Check out gh-pages history
+        if: env.PUBLISH == 'true'
+        uses: actions/checkout@v4
+        continue-on-error: true # first run: branch does not exist yet
+        with:
+          ref: gh-pages
+          path: site
+
+      - name: Build site (runs/<run_id>, latest, index)
+        if: env.PUBLISH == 'true'
+        shell: bash
+        env:
+          BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: |
+          mkdir -p site
+          rm -rf site/.git "site/runs/${{ github.run_id }}" site/latest
+          mkdir -p "site/runs/${{ github.run_id }}" site/latest
+          cp -R html/. "site/runs/${{ github.run_id }}/"
+          cp -R html/. site/latest/
+          cp results/results.json "site/runs/${{ github.run_id }}/results.json"
+          status=$([ "${{ needs.test.result }}" = "success" ] && echo passed || echo failed)
+          npx tsx scripts/pages-index.ts --site site --path "runs/${{ github.run_id }}" --kind ci \
+            --status "$status" --branch "$BRANCH" --commit "${{ github.sha }}" \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" --keep 30
+
+      - name: Publish to GitHub Pages
+        if: env.PUBLISH == 'true'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: site
+          # The site folder already holds the full history (checked out above) and is pruned to 30 runs
+          # by pages-index.ts, so a full replace keeps history AND applies pruning.
+          keep_files: false
+          commit_message: 'report: CI run ${{ github.run_id }}'
+
+      - name: Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: >
+          npx tsx scripts/slack-notify.ts run
+          --results results/results.json --heals results/heal-report.json
+          ${{ env.PUBLISH == 'true' && format('--report-url {0}/runs/{1}/', env.PAGES_URL, github.run_id) || '' }}
+
+  triage:
+    name: triage
+    needs: test
+    if: ${{ failure() && needs.test.result == 'failure' && github.event.pull_request.head.repo.fork != true }}
+    uses: ./.github/workflows/triage.yml
+    with:
+      run_id: ${{ github.run_id }}
+    secrets: inherit

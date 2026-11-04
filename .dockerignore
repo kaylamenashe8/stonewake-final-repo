@@ -1,0 +1,10 @@
+node_modules
+playwright-report
+test-results
+blob-report
+.auth
+.git
+.env
+crawler/out
+triage/out
+control-center/node_modules

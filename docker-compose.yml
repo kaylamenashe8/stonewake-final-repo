@@ -1,0 +1,40 @@
+# Identical local runs to CI (D11). .env is passed through (never baked into the image).
+#   docker compose run --rm test                     # full suite
+#   docker compose run --rm test npx playwright test --grep @smoke
+#   docker compose run --rm update-snapshots         # visual baselines, Linux only (never from macOS)
+#   docker compose run --rm --service-ports codegen-report   # serve the last HTML report on :9323
+x-base: &base
+  build: .
+  image: itac-kit-tests:local
+  ipc: host
+  env_file:
+    - path: .env
+      required: false
+  environment:
+    CI: 'true'
+    HOME: /root
+  volumes:
+    - ./tests:/work/tests
+    - ./src:/work/src
+    - ./playwright.config.ts:/work/playwright.config.ts
+    - ./test-results:/work/test-results
+    - ./playwright-report:/work/playwright-report
+
+services:
+  test:
+    <<: *base
+    command: npx playwright test
+
+  update-snapshots:
+    <<: *base
+    environment:
+      CI: 'true'
+      HOME: /root
+      VISUAL: '1'
+    command: npx playwright test --grep @visual --update-snapshots --project=chromium
+
+  codegen-report:
+    <<: *base
+    ports:
+      - '9323:9323'
+    command: npx playwright show-report --host 0.0.0.0 --port 9323

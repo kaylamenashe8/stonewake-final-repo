@@ -1,0 +1,179 @@
+# Stability Gate (D2, D3, D5): 5 full-suite runs of the same commit, retries 0, HEAL_MODE=strict.
+#   parallel   (default, final evidence): one workflow run, 5 matrix jobs at the same time (~6 min).
+#   sequential (backup): run-1 → run-5 chained with `needs`; the chain stops at the first red (~5 suite runs).
+# gate-summary reads the 5 results, prints `GATE: 5/5 GREEN` or the failing run, publishes once, posts Slack.
+name: Stability Gate
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: parallel = 5 jobs at once (evidence); sequential = 5 chained jobs (backup)
+        type: choice
+        options: [parallel, sequential]
+        default: parallel
+      shards:
+        description: Shards per run (1 = each job runs the full suite with Playwright workers). 5 runs x 4 shards = 20 jobs (free-plan limit).
+        type: choice
+        options: ['1', '2', '4']
+        default: '1'
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: stability-gate
+  cancel-in-progress: false
+
+jobs:
+  # ---------- parallel mode ----------
+  parallel:
+    name: gate run-${{ matrix.run }}
+    if: ${{ inputs.mode == 'parallel' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        run: [1, 2, 3, 4, 5]
+    uses: ./.github/workflows/run-suite.yml
+    with:
+      run_label: run-${{ matrix.run }}
+      retries: 0
+      heal_mode: strict
+      shard_total: ${{ fromJSON(inputs.shards) }}
+    secrets: inherit
+
+  # ---------- sequential mode (backup) ----------
+  run-1:
+    if: ${{ inputs.mode == 'sequential' }}
+    uses: ./.github/workflows/run-suite.yml
+    with: { run_label: run-1, retries: 0, heal_mode: strict, shard_total: '${{ fromJSON(inputs.shards) }}' }
+    secrets: inherit
+  run-2:
+    needs: run-1
+    uses: ./.github/workflows/run-suite.yml
+    with: { run_label: run-2, retries: 0, heal_mode: strict, shard_total: '${{ fromJSON(inputs.shards) }}' }
+    secrets: inherit
+  run-3:
+    needs: run-2
+    uses: ./.github/workflows/run-suite.yml
+    with: { run_label: run-3, retries: 0, heal_mode: strict, shard_total: '${{ fromJSON(inputs.shards) }}' }
+    secrets: inherit
+  run-4:
+    needs: run-3
+    uses: ./.github/workflows/run-suite.yml
+    with: { run_label: run-4, retries: 0, heal_mode: strict, shard_total: '${{ fromJSON(inputs.shards) }}' }
+    secrets: inherit
+  run-5:
+    needs: run-4
+    uses: ./.github/workflows/run-suite.yml
+    with: { run_label: run-5, retries: 0, heal_mode: strict, shard_total: '${{ fromJSON(inputs.shards) }}' }
+    secrets: inherit
+
+  # ---------- verdict, publish once, Slack ----------
+  gate-summary:
+    name: gate-summary
+    needs: [parallel, run-1, run-2, run-3, run-4, run-5]
+    if: ${{ always() && !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+    env:
+      PAGES_URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}
+      GATE_PATH: gate/${{ github.run_id }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+
+      - name: Download run results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: results-run-*
+          path: gate-results
+      - name: Download run reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: report-run-*
+          path: gate-reports
+
+      - name: Normalise folders (results-run-N -> run-N)
+        shell: bash
+        run: |
+          shopt -s nullglob
+          for d in gate-results/results-run-*; do mv "$d" "gate-results/${d#gate-results/results-}"; done
+          for d in gate-reports/report-run-*; do mv "$d" "gate-reports/${d#gate-reports/report-}"; done
+          find gate-results -maxdepth 2 -type f | sort
+
+      - name: Gate summary
+        id: gate
+        continue-on-error: true
+        run: >
+          npx tsx scripts/gate-summary.ts --dir gate-results --runs 5 --mode ${{ inputs.mode }}
+          --report-url ${{ env.PAGES_URL }}/${{ env.GATE_PATH }}/
+
+      - name: Check out gh-pages history
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: site
+
+      - name: Build site (gate/<run_id>/run-1..5 + index)
+        shell: bash
+        run: |
+          mkdir -p site
+          rm -rf site/.git "site/$GATE_PATH"
+          mkdir -p "site/$GATE_PATH"
+          links=""
+          for n in 1 2 3 4 5; do
+            if [ -d "gate-reports/run-$n" ]; then
+              mkdir -p "site/$GATE_PATH/run-$n"
+              cp -R "gate-reports/run-$n/." "site/$GATE_PATH/run-$n/"
+              links="$links<li><a href=\"run-$n/\">run-$n</a></li>"
+            else
+              links="$links<li>run-$n: no report</li>"
+            fi
+          done
+          cp gate-results/gate-summary.json "site/$GATE_PATH/" 2>/dev/null || true
+          verdict=$(node -e 'try{console.log(require("./gate-results/gate-summary.json").verdict)}catch{console.log("GATE: no summary")}')
+          cat > "site/$GATE_PATH/index.html" <<HTML
+          <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+          <title>Stability gate ${{ github.run_id }}</title>
+          <style>body{font:15px/1.5 system-ui,sans-serif;margin:24px 16px;background:#fff;color:#1b1f24}
+          @media (prefers-color-scheme:dark){body{background:#0d1117;color:#e6edf3}a{color:#58a6ff}}</style></head>
+          <body><h1>$verdict</h1><p>Mode: ${{ inputs.mode }} · retries 0 · HEAL_MODE=strict · commit ${{ github.sha }}</p>
+          <p><a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">Actions run</a> · <a href="../../">history</a></p>
+          <ul>$links</ul></body></html>
+          HTML
+          status=$([ "${{ steps.gate.outcome }}" = "success" ] && echo passed || echo failed)
+          npx tsx scripts/pages-index.ts --site site --path "$GATE_PATH" --kind gate --status "$status" \
+            --branch "${{ github.ref_name }}" --commit "${{ github.sha }}" --summary "$verdict (${{ inputs.mode }})" \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" --keep 30
+
+      - name: Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: site
+          keep_files: false # site/ already holds the checked-out history, pruned to 30 by pages-index.ts
+          commit_message: 'report: stability gate ${{ github.run_id }}'
+
+      - name: Slack
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: >
+          npx tsx scripts/slack-notify.ts gate --dir gate-results --runs 5
+          --report-url ${{ env.PAGES_URL }}/${{ env.GATE_PATH }}/
+
+      - name: Fail when the gate is red
+        if: steps.gate.outcome != 'success'
+        run: |
+          echo "Stability gate is RED — see the job summary."
+          exit 1

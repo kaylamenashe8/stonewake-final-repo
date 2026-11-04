@@ -1,7 +1,18 @@
-# Playwright
-/blob-report/
-/playwright/.cache/
-/playwright/.auth/
+node_modules/
+playwright-report/
+test-results/
+blob-report/
+.auth/
+.env
+.env.*
+!.env.example
+crawler/out/
+triage/out/
+heal-report.json
+.agents/status/*.json
+!.agents/status/.gitkeep
+.DS_Store
 
-# Secrets
+# from the original repo
+/playwright/.cache/
 .playwright-mcp/

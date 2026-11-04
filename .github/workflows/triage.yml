@@ -1,0 +1,233 @@
+# Triage: the diagnosis ladder on CI failures (D4, D6, D7).
+#   rung 1 isolated rerun → rung 2 rule classifier → rung 3 crawler   (job: ladder, Playwright container)
+#   rung 4 Claude, only for what is still undecided, max 3            (job: claude)
+#   merge + job summary + artifact + Slack                             (job: publish)
+# Fork PRs never reach this workflow (ci.yml guards). Claude only diagnoses and proposes: verdicts, a job summary, and ai-fix/* draft PRs. It never pushes to main.
+name: Triage
+
+on:
+  # Called by ci.yml when its test job fails (same run: artifacts results-ci, test-results-ci-<shard>).
+  workflow_call:
+    inputs:
+      run_id:
+        description: CI run whose artifacts to triage
+        type: string
+        required: true
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: triage-${{ inputs.run_id }}
+  cancel-in-progress: false
+
+env:
+  SOURCE_RUN_ID: ${{ inputs.run_id }}
+
+jobs:
+  ladder:
+    name: ladder (rerun, classifier, crawler)
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    env:
+      HOME: /root
+      CI: 'true'
+      BASE_URL: ${{ vars.BASE_URL }}
+      API_URL: ${{ vars.API_URL }}
+      TEST_ID_ATTRIBUTE: ${{ vars.TEST_ID_ATTRIBUTE }}
+      TEST_USER: ${{ secrets.TEST_USER }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      HEAL_MODE: 'off'
+      RUN_ID: triage-${{ github.run_id }}
+    outputs:
+      for_claude: ${{ steps.ladder.outputs.for_claude }}
+      failures: ${{ steps.ladder.outputs.failures }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: Download merged results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: results-*
+          path: triage/in/results
+          run-id: ${{ env.SOURCE_RUN_ID }}
+          github-token: ${{ github.token }}
+
+      - name: Download raw test results (traces, screenshots)
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          pattern: test-results-*
+          path: triage/in/test-results
+          run-id: ${{ env.SOURCE_RUN_ID }}
+          github-token: ${{ github.token }}
+
+      - name: Run ladder (rungs 1-3)
+        id: ladder
+        run: npx tsx triage/ladder.ts --reports triage/in --no-claude
+
+      - name: Upload ladder output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: triage-ladder
+          path: triage/out
+          retention-days: 14
+
+  claude:
+    name: claude (rung 4)
+    needs: ladder
+    if: ${{ needs.ladder.outputs.for_claude != '' && needs.ladder.outputs.for_claude != '0' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Skipped, not failed, when no credential is set (D7: API key primary, OAuth token fallback).
+      HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' || secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
+      HAS_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+    steps:
+      - name: No Claude credential
+        if: env.HAS_KEY != 'true'
+        run: echo "::notice::Claude rung skipped (no ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN)."
+
+      - uses: actions/checkout@v4
+        if: env.HAS_KEY == 'true'
+
+      - uses: actions/setup-node@v4
+        if: env.HAS_KEY == 'true'
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+        if: env.HAS_KEY == 'true'
+
+      - uses: actions/download-artifact@v4
+        if: env.HAS_KEY == 'true'
+        with:
+          name: triage-ladder
+          path: triage/out
+
+      - name: Claude diagnose (claude-code-action)
+        id: claude
+        if: env.HAS_KEY == 'true'
+        continue-on-error: true
+        timeout-minutes: 5
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ github.token }}
+          claude_args: >-
+            --max-turns 10
+            --allowedTools "Read,Glob,Grep,Write(triage/out/**),Edit(src/**),Edit(tests/**),Bash(git checkout -b ai-fix/*),Bash(git add *),Bash(git commit *),Bash(git push origin ai-fix/*),Bash(gh pr create *)"
+          prompt: |
+            You are rung 4 of the Playwright failure triage ladder for this repository. The cheaper rungs
+            (isolated rerun, rule classifier, crawler) left the failures in triage/out/undecided.json
+            undecided. A context pack per failure is in triage/out/context/*.md (test source, page objects,
+            error, last trace actions, failed network calls, console errors, crawler evidence).
+
+            For each failure (at most 3), decide exactly one classification:
+            flaky | automation | product | environment, with an honest confidence 0-1.
+
+            Write triage/out/claude-verdicts.json: a JSON array, one object per failure, with fields
+            test, file, line, project (copied from undecided.json), rung "claude", classification,
+            confidence, root_cause, evidence (array of strings citing the context pack),
+            proposed_fix (unified diff, or omit), and bug_draft {title, steps[], expected, actual,
+            severity} only when classification is product.
+
+            Only for an automation verdict with confidence >= 0.8 and a concrete fix: create branch
+            ai-fix/<short-test-slug>, apply the minimal fix in src/ or tests/, commit, push that branch,
+            and open a DRAFT pull request against main with `gh pr create --draft`, titled
+            "ai-fix: <test title>", whose body has the root cause, the evidence, and the note
+            "Proposed by Claude triage; needs Lead review." Never push to main, never raise retries,
+            never add waitForTimeout or force: true, never skip or delete a test.
+
+      - name: Fallback - direct Messages API
+        if: env.HAS_API_KEY == 'true' && (steps.claude.outcome != 'success' || hashFiles('triage/out/claude-verdicts.json') == '')
+        timeout-minutes: 6
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: npx tsx triage/claude-diagnose.ts --from triage/out/undecided.json
+
+      - name: Upload Claude verdicts
+        if: always() && env.HAS_KEY == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: triage-claude
+          path: triage/out/claude-verdicts.json
+          if-no-files-found: ignore
+          retention-days: 14
+
+  publish:
+    name: publish verdicts
+    needs: [ladder, claude]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # ladder.ts imports src/config/env.ts, which validates these even in --merge-claude mode.
+      BASE_URL: ${{ vars.BASE_URL }}
+      API_URL: ${{ vars.API_URL }}
+      TEST_ID_ATTRIBUTE: ${{ vars.TEST_ID_ATTRIBUTE }}
+      TEST_USER: ${{ secrets.TEST_USER }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci --no-audit --no-fund
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: triage-ladder
+          path: triage/out
+
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: triage-claude
+          path: triage/out
+
+      - name: Merge verdicts and write job summary
+        run: npx tsx triage/ladder.ts --merge-claude
+
+      - name: Upload triage-verdicts
+        uses: actions/upload-artifact@v4
+        with:
+          name: triage-verdicts
+          path: |
+            triage/out/verdicts.json
+            triage/out/summary.md
+            triage/out/bug-drafts.json
+            triage/out/actions.json
+            triage/out/stabilizer-queue.md
+            triage/out/crawl-evidence.json
+            triage/out/crawl/
+          if-no-files-found: ignore
+          retention-days: 30
+
+      - name: Slack
+        if: ${{ hashFiles('scripts/slack-notify.ts') != '' }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then echo "No SLACK_WEBHOOK_URL: skipped"; exit 0; fi
+          npx tsx scripts/slack-notify.ts triage --verdicts triage/out/verdicts.json

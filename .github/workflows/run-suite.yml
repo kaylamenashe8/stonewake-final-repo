@@ -1,0 +1,184 @@
+# Reusable full-suite run (one "run" of the suite, optionally sharded). Used by ci.yml and stability-gate.yml.
+# Outputs (artifacts, all suffixed with the run label):
+#   results-<label>       results.json (merged Playwright JSON) + heal-report.json (merged heals)
+#   report-<label>        merged HTML report
+#   blob-<label>-<shard>  blob report + per-shard heal file
+#   test-results-<label>-<shard>  traces, screenshots, videos (only when the shard failed) — used by triage
+name: run-suite
+
+on:
+  workflow_call:
+    inputs:
+      run_label:
+        description: Label for this run (ci, run-1 ... run-5). Becomes part of RUN_ID and artifact names.
+        type: string
+        required: true
+      retries:
+        type: number
+        default: 0
+      heal_mode:
+        description: off | log | strict
+        type: string
+        default: log
+      shard_total:
+        description: 1, 2, 3 or 4
+        type: number
+        default: 1
+      grep:
+        description: Optional --grep filter (e.g. @smoke)
+        type: string
+        default: ''
+      projects:
+        description: Space-separated Playwright projects
+        type: string
+        default: chromium api
+    secrets:
+      TEST_USER:
+        required: false
+      TEST_PASSWORD:
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  suite:
+    name: suite (${{ inputs.run_label }}, shard ${{ matrix.shard }}/${{ inputs.shard_total }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(inputs.shard_total == 4 && '[1,2,3,4]' || inputs.shard_total == 3 && '[1,2,3]' || inputs.shard_total == 2 && '[1,2]' || '[1]') }}
+    env:
+      HOME: /root
+      CI: 'true'
+      BASE_URL: ${{ vars.BASE_URL }}
+      API_URL: ${{ vars.API_URL }}
+      TEST_ID_ATTRIBUTE: ${{ vars.TEST_ID_ATTRIBUTE }}
+      TEST_USER: ${{ secrets.TEST_USER }}
+      TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      HEAL_MODE: ${{ inputs.heal_mode }}
+      RUN_ID: ${{ github.run_id }}-${{ inputs.run_label }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Run suite
+        id: run
+        shell: bash
+        env:
+          PROJECTS: ${{ inputs.projects }}
+          GREP: ${{ inputs.grep }}
+          RETRIES: ${{ inputs.retries }}
+          SHARD: ${{ matrix.shard }}/${{ inputs.shard_total }}
+        run: |
+          args=(--retries="$RETRIES" --shard="$SHARD")
+          read -r -a projects <<< "$PROJECTS"
+          for p in "${projects[@]}"; do args+=(--project="$p"); done
+          if [ -n "$GREP" ]; then args+=(--grep "$GREP"); fi
+          npx playwright test "${args[@]}"
+
+      - name: Collect heal report
+        if: always()
+        shell: bash
+        run: |
+          mkdir -p heal
+          if [ -f test-results/heal-report.json ]; then
+            cp test-results/heal-report.json "heal/heal-${{ matrix.shard }}.json"
+          else
+            echo '{"count":0,"heals":[]}' > "heal/heal-${{ matrix.shard }}.json"
+          fi
+
+      - name: Upload blob report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-${{ inputs.run_label }}-${{ matrix.shard }}
+          path: |
+            blob-report
+            heal
+          retention-days: 7
+
+      - name: Upload test results (traces) on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ inputs.run_label }}-${{ matrix.shard }}
+          path: test-results
+          retention-days: 7
+
+  merge:
+    name: merge (${{ inputs.run_label }})
+    needs: suite
+    if: ${{ always() && !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    env:
+      HOME: /root
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache npm
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-${{ runner.os }}-
+
+      - run: npm ci --no-audit --no-fund
+
+      - name: Download shard blobs
+        uses: actions/download-artifact@v4
+        with:
+          pattern: blob-${{ inputs.run_label }}-*
+          path: all
+          merge-multiple: true
+
+      - name: Merge reports (html + json)
+        shell: bash
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_FILE: out/results.json
+          PLAYWRIGHT_HTML_OUTPUT_DIR: out/html
+          PLAYWRIGHT_HTML_OPEN: never
+        run: |
+          mkdir -p out
+          npx playwright merge-reports --reporter=html,json all/blob-report
+          node -e '
+            const fs = require("fs");
+            const files = fs.existsSync("all/heal") ? fs.readdirSync("all/heal") : [];
+            const heals = files.flatMap(f => JSON.parse(fs.readFileSync("all/heal/" + f, "utf8")).heals ?? []);
+            fs.writeFileSync("out/heal-report.json", JSON.stringify({ count: heals.length, heals }, null, 2));
+            console.log("heals:", heals.length);
+          '
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: results-${{ inputs.run_label }}
+          path: |
+            out/results.json
+            out/heal-report.json
+          retention-days: 14
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-${{ inputs.run_label }}
+          path: out/html
+          retention-days: 14

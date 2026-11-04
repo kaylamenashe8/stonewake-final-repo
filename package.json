@@ -4,14 +4,45 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:gate": "HEAL_MODE=strict playwright test --retries=0",
+    "test:10x": "playwright test --repeat-each=10 --retries=0 --workers=1",
+    "lint": "eslint . --max-warnings=0",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "verify": "npm run lint && npm run typecheck && playwright test --grep @smoke --project=chromium",
+    "report": "playwright show-report",
+    "version-check": "bash scripts/version-check.sh",
+    "diagnose": "tsx triage/crawler-diagnose.ts",
+    "triage:classify": "tsx triage/classifier.ts",
+    "triage:claude": "tsx triage/claude-diagnose.ts",
+    "crawl": "tsx crawler/crawl.ts",
+    "promote": "tsx crawler/promote.ts",
+    "spira": "tsx scripts/spira-file.ts",
+    "plan:issues": "tsx scripts/plan-to-issues.ts",
+    "gate:summary": "tsx scripts/gate-summary.ts",
+    "control-center": "node control-center/server.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "devDependencies": {
     "@playwright/test": "1.64.1",
-    "@types/node": "^26.6.6"
+    "@types/node": "^22.0.0",
+    "@anthropic-ai/sdk": "1.4.0",
+    "@axe-core/playwright": "4.14.0",
+    "@eslint/js": "10.0.1",
+    "@faker-js/faker": "10.6.0",
+    "eslint": "10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-playwright": "2.12.2",
+    "prettier": "3.9.10",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.72.1",
+    "zod": "4.6.7"
   }
 }

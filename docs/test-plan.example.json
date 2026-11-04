@@ -1,0 +1,17 @@
+{
+  "product": "Example demo shop (replace with the Recon product profile)",
+  "generatedBy": "Recon agent from docs/BASELINE.md + crawler/out/site-map.json + coverage templates",
+  "items": [
+    { "id": "T01", "title": "Login with valid credentials lands on the products page", "layer": "auth", "risk": "high", "priority": "P1", "requirement": "REQ-AUTH-01" },
+    { "id": "T02", "title": "Login rejects a wrong password and an unknown user", "layer": "auth", "risk": "high", "priority": "P1", "requirement": "REQ-AUTH-02" },
+    { "id": "T03", "title": "Protected page redirects to login when logged out", "layer": "auth", "risk": "high", "priority": "P1", "requirement": "REQ-AUTH-03" },
+    { "id": "T04", "title": "Add two products and the cart total equals the sum of their prices", "layer": "ui", "risk": "high", "priority": "P1", "requirement": "REQ-CART-01" },
+    { "id": "T05", "title": "Checkout up to the order summary (no real payment)", "layer": "ui", "risk": "high", "priority": "P1", "requirement": "REQ-CHK-01" },
+    { "id": "T06", "title": "Cart endpoint: happy path, 401 without token, 400 on bad quantity", "layer": "api", "risk": "high", "priority": "P1", "requirement": "REQ-API-01" },
+    { "id": "T07", "title": "Checkout form validation: required fields and zip format", "layer": "ui", "risk": "medium", "priority": "P2", "requirement": "REQ-CHK-02" },
+    { "id": "T08", "title": "Product list shows an error state when the API returns 500", "layer": "ui", "risk": "medium", "priority": "P2", "requirement": "REQ-ERR-01" },
+    { "id": "T09", "title": "Sort by price low to high orders the list", "layer": "ui", "risk": "medium", "priority": "P2", "requirement": "REQ-LIST-01" },
+    { "id": "T10", "title": "No critical or serious axe violations on home, product, cart", "layer": "a11y", "risk": "low", "priority": "P3", "requirement": "REQ-A11Y-01" },
+    { "id": "T11", "title": "Visual baseline of product page and cart", "layer": "visual", "risk": "low", "priority": "P3", "requirement": "REQ-VIS-01" }
+  ]
+}
