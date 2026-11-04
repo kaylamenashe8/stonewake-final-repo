@@ -31,6 +31,12 @@ void test('net::ERR is environment and final', () => {
   assert.equal(r.next, 'stop');
 });
 
+void test('missing secret on the runner is environment and final', () => {
+  const r = classify({ ...base, error: 'Error: STONEWAKE_API_KEY is not set (see .env.example)' }, ev());
+  assert.equal(r.verdict.classification, 'environment');
+  assert.equal(r.next, 'stop');
+});
+
 void test('navigation timeout is environment', () => {
   const r = classify({ ...base, error: 'TimeoutError: page.goto: Timeout 20000ms exceeded.' }, ev());
   assert.equal(r.verdict.classification, 'environment');

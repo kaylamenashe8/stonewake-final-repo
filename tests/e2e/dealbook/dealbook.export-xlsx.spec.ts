@@ -1,0 +1,19 @@
+import { test, expect } from '../../../src/fixtures';
+import { aiGenerated, requirement } from '../../../src/utils/annotations';
+import { DealBookFlows } from '../../generated/pages/DealBookFlows';
+import { MIN_EXPORT_BYTES, savedFile } from '../../generated/pages/downloads';
+
+test.describe('Deal Book Excel export @regression', () => {
+  test('should download an Excel workbook when Export is clicked on the Deal Book', async ({ page }) => {
+    requirement('T03');
+    aiGenerated('b9c303a');
+    const dealBook = new DealBookFlows(page);
+    await dealBook.open();
+
+    const file = await savedFile(await dealBook.exportDeals());
+
+    expect(file.filename).toMatch(/^Stonewake - Deal Book - \d{4}-\d{2}-\d{2}\.xlsx$/);
+    expect(file.magic).toMatch(/^PK/); // xlsx is a zip container
+    expect(file.bytes).toBeGreaterThan(MIN_EXPORT_BYTES);
+  });
+});
