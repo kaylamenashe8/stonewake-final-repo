@@ -4,7 +4,7 @@
 #   scripts/setup-secrets.sh -R owner/repo [-f .env]
 #
 # Secrets: ANTHROPIC_API_KEY (or CLAUDE_CODE_OAUTH_TOKEN fallback, D7), SLACK_WEBHOOK_URL,
-#          TEST_USER, TEST_PASSWORD, SPIRA_URL, SPIRA_USER, SPIRA_API_KEY, SPIRA_PROJECT_ID
+#          TEST_USER, TEST_PASSWORD, STONEWAKE_API_KEY, SPIRA_URL, SPIRA_USER, SPIRA_API_KEY, SPIRA_PROJECT_ID
 # Variables: BASE_URL, API_URL, TEST_ID_ATTRIBUTE
 set -euo pipefail
 
@@ -20,7 +20,7 @@ if [ -z "$REPO" ]; then echo "usage: $0 -R owner/repo [-f .env]" >&2; exit 2; fi
 if [ ! -f "$ENV_FILE" ]; then echo "$ENV_FILE not found (copy .env.example)" >&2; exit 2; fi
 command -v gh >/dev/null || { echo "gh CLI required" >&2; exit 2; }
 
-SECRETS=(ANTHROPIC_API_KEY CLAUDE_CODE_OAUTH_TOKEN SLACK_WEBHOOK_URL TEST_USER TEST_PASSWORD SPIRA_URL SPIRA_USER SPIRA_API_KEY SPIRA_PROJECT_ID)
+SECRETS=(ANTHROPIC_API_KEY CLAUDE_CODE_OAUTH_TOKEN SLACK_WEBHOOK_URL TEST_USER TEST_PASSWORD STONEWAKE_API_KEY SPIRA_URL SPIRA_USER SPIRA_API_KEY SPIRA_PROJECT_ID)
 VARS=(BASE_URL API_URL TEST_ID_ATTRIBUTE)
 
 # Read KEY=VALUE without sourcing (no code execution from .env).
