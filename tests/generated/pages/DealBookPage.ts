@@ -87,6 +87,17 @@ export class DealBookPage extends BasePage {
     return first;
   }
 
+  /** Opens the first listed deal (client-side route to /deals/:id); returns the name and sector the list showed. */
+  async openFirstDeal(): Promise<{ name: string; sector: string }> {
+    // first(): the test takes whichever deal ranks first today instead of a hardcoded id.
+    const link = (await this.dealRows()).first().getByRole('link');
+    const listed = dealLinkParts(await link.innerText());
+    if (!listed.name || !listed.sector)
+      throw new Error('Deal Book: cannot read name and sector of the first deal');
+    await link.click();
+    return listed;
+  }
+
   // Not BasePage.actAndWaitFor: the caller needs the response body (total), not just the wait.
   private async dealsTotal(action: () => Promise<void>, urlPart = ''): Promise<number> {
     const response = this.page.waitForResponse(
