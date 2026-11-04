@@ -1,10 +1,11 @@
-import { test, expect } from '../../src/fixtures';
-import { requirement } from '../../src/utils/annotations';
-import { DEAL_PAGE_SIZE, DealBookPage } from './pages/DealBookPage';
+import { test, expect } from '../../../src/fixtures';
+import { aiGenerated, requirement } from '../../../src/utils/annotations';
+import { DEAL_PAGE_SIZE, DealBookPage } from '../../generated/pages/DealBookPage';
 
 test.describe('Deal Book sector filter @regression', () => {
   test('should list only deals of the chosen sector when a sector filter is applied', async ({ page }) => {
     requirement('T01');
+    aiGenerated('e80d159');
     const dealBook = new DealBookPage(page);
     const allTotal = await dealBook.open();
     // Sector chosen from live data (first listed deal), so the test does not depend on a fixed dataset.
