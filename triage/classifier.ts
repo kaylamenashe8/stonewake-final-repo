@@ -32,6 +32,8 @@ const ENV_PATTERNS: [RegExp, string][] = [
   [/page\.goto: Timeout|Navigation timeout|waiting for navigation|frame\.goto: Timeout/i, 'navigation timeout'],
   [/\b(502|503|504) (Bad Gateway|Service Unavailable|Gateway Time-?out)/i, 'gateway error on page load'],
   [/\b429\b|Too Many Requests|cf-challenge|Just a moment\.\.\.|Attention Required/i, 'rate limit or bot challenge'],
+  // A required secret/env var is absent on this runner: CI configuration, not test code or product.
+  [/\b[A-Z][A-Z0-9_]{2,} is not set\b|Missing required env(ironment)? var/, 'required secret or env var not set on the runner'],
 ];
 
 const AUTOMATION_STOP_PATTERNS: [RegExp, string][] = [
