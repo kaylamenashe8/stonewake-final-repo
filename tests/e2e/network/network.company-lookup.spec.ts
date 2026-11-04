@@ -1,7 +1,7 @@
-import { test, expect } from '../../src/fixtures';
-import { requirement } from '../../src/utils/annotations';
-import { CompanyPage } from './pages/CompanyPage';
-import { NetworkPage } from './pages/NetworkPage';
+import { test, expect } from '../../../src/fixtures';
+import { aiGenerated, requirement } from '../../../src/utils/annotations';
+import { CompanyPage } from '../../generated/pages/CompanyPage';
+import { NetworkPage } from '../../generated/pages/NetworkPage';
 
 // The product's own lookup example ("for example Siemens Energy"); the UK subsidiary files officers and a
 // parent with Companies House and GLEIF, so it has owners, officers and a chain. Register data, not live scores.
@@ -14,6 +14,7 @@ test.describe('Network company lookup @regression', () => {
     page,
   }) => {
     requirement('T08');
+    aiGenerated('1581c80');
     const network = new NetworkPage(page);
     const company = new CompanyPage(page);
 
