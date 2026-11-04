@@ -1,7 +1,7 @@
 # Automation test plan
 
 > Live plan: one GitHub issue per item, labels P1/P2/P3, created by `npm run plan:issues` from [TEST_PLAN.json](TEST_PLAN.json).
-> This file is the Scribe's export (2026-11-04 19:55 IST, updated 20:10 for #48, #49, #51, #52), made with
+> This file is the Scribe's export (2026-11-04 19:55 IST, updated 20:20: #41, #42, #45, #48, #49, #51, #52 merged), made with
 > `gh issue list --label P1|P2|P3 --state all --json number,title,labels,state,closedByPullRequestsReferences`.
 > Linked from the STP traceability matrix ([STP.md](STP.md#7-traceability-matrix)).
 > T28-T34 were added to TEST_PLAN.json on the day (PR #30, D17/D18) and have no issue yet.
@@ -12,13 +12,13 @@ No test starts after 20:00 (TIMELINE), so every item still "not started" at 20:0
 | # | Item | Layer | Priority | Issue | Status | Test file | PR |
 |---|---|---|---|---|---|---|---|
 | T01 | Deal Book: filter by sector narrows the list | ui | P1 | [#1](https://github.com/kaylamenashe8/stonewake-final-repo/issues/1) | merged | tests/e2e/dealbook/dealbook.filter-sector.spec.ts | [#31](https://github.com/kaylamenashe8/stonewake-final-repo/pull/31) |
-| T02 | Deal Book: open a deal shows brief, key facts, view at source | ui | P1 | [#2](https://github.com/kaylamenashe8/stonewake-final-repo/issues/2) | open PR | (in PR) | [#41](https://github.com/kaylamenashe8/stonewake-final-repo/pull/41) (re-open of #34) |
-| T03 | Deal Book: Export downloads .xlsx (PDF parked, 429) | ui | P1 | [#3](https://github.com/kaylamenashe8/stonewake-final-repo/issues/3) | open PR | (in PR) | [#42](https://github.com/kaylamenashe8/stonewake-final-repo/pull/42) |
+| T02 | Deal Book: open a deal shows brief, key facts, view at source | ui | P1 | [#2](https://github.com/kaylamenashe8/stonewake-final-repo/issues/2) | merged | tests/e2e/dealbook/dealbook.open-deal.spec.ts | [#41](https://github.com/kaylamenashe8/stonewake-final-repo/pull/41) (re-open of #34) |
+| T03 | Deal Book: Export downloads .xlsx (PDF parked, 429) | ui | P1 | [#3](https://github.com/kaylamenashe8/stonewake-final-repo/issues/3) | merged (.xlsx; PDF part stays in tests/generated/, not promoted) | tests/e2e/dealbook/dealbook.export-xlsx.spec.ts | [#42](https://github.com/kaylamenashe8/stonewake-final-repo/pull/42) |
 | T04 | Deal Book: sort order | ui | P2 | [#14](https://github.com/kaylamenashe8/stonewake-final-repo/issues/14) | not started | | |
 | T05 | Screenings: company screening verdict cites sources | ui | P1 | [#4](https://github.com/kaylamenashe8/stonewake-final-repo/issues/4) | not started | | |
 | T06 | Screenings: person screening never shows a rating | ui | P1 | [#5](https://github.com/kaylamenashe8/stonewake-final-repo/issues/5) | not started | | |
 | T07 | Screenings: PDF report download | ui | P2 | [#15](https://github.com/kaylamenashe8/stonewake-final-repo/issues/15) | not started | | |
-| T08 | Network: owners, officers, ownership chain with sources | ui | P1 | [#6](https://github.com/kaylamenashe8/stonewake-final-repo/issues/6) | open PR | (in PR) | [#52](https://github.com/kaylamenashe8/stonewake-final-repo/pull/52) |
+| T08 | Network: owners, officers, ownership chain with sources | ui | P1 | [#6](https://github.com/kaylamenashe8/stonewake-final-repo/issues/6) | merged | tests/e2e/network/network.company-lookup.spec.ts | [#52](https://github.com/kaylamenashe8/stonewake-final-repo/pull/52) |
 | T09 | Institutions: Kind and Country filters | ui | P2 | [#16](https://github.com/kaylamenashe8/stonewake-final-repo/issues/16) | not started | | |
 | T10 | Countries: risk score and cited indicators | ui | P1 | [#7](https://github.com/kaylamenashe8/stonewake-final-repo/issues/7) | merged | tests/e2e/countries/country-profile.risk-score.spec.ts | [#48](https://github.com/kaylamenashe8/stonewake-final-repo/pull/48) |
 | T11 | Countries: risk tile counts match table and API | ui | P2 | [#17](https://github.com/kaylamenashe8/stonewake-final-repo/issues/17) | not started | | |
@@ -31,7 +31,7 @@ No test starts after 20:00 (TIMELINE), so every item still "not started" at 20:0
 | T18 | API: screenings, network, ownership contracts | api | P1 | [#12](https://github.com/kaylamenashe8/stonewake-final-repo/issues/12) | merged | tests/api/screenings.list.spec.ts, tests/api/network.get.spec.ts, tests/api/ownership.get.spec.ts | [#36](https://github.com/kaylamenashe8/stonewake-final-repo/pull/36) |
 | T19 | API: viewer key is read-only (403 on writes) | api | P1 | [#13](https://github.com/kaylamenashe8/stonewake-final-repo/issues/13) | not started | | |
 | T20 | API: 422 envelope on bad filters; rate-limit headers | api | P2 | [#20](https://github.com/kaylamenashe8/stonewake-final-repo/issues/20) | merged | tests/api/deals.filters.spec.ts, tests/api/ratelimit.headers.spec.ts | [#36](https://github.com/kaylamenashe8/stonewake-final-repo/pull/36) |
-| T21 | MCP: same entity as REST | api | P2 | [#21](https://github.com/kaylamenashe8/stonewake-final-repo/issues/21) | merged; SPIRA-89 knownBug test in open PR | tests/api/mcp.entity.spec.ts | [#36](https://github.com/kaylamenashe8/stonewake-final-repo/pull/36), [#51](https://github.com/kaylamenashe8/stonewake-final-repo/pull/51) |
+| T21 | MCP: same entity as REST | api | P2 | [#21](https://github.com/kaylamenashe8/stonewake-final-repo/issues/21) | merged; SPIRA-89 knownBug test merged | tests/api/mcp.entity.spec.ts | [#36](https://github.com/kaylamenashe8/stonewake-final-repo/pull/36), [#51](https://github.com/kaylamenashe8/stonewake-final-repo/pull/51) |
 | T22 | Auth: session persists, deep link after login | auth | P2 | [#22](https://github.com/kaylamenashe8/stonewake-final-repo/issues/22) | not started | | |
 | T23 | Team selector switches Deal Book without leaking | ui | P2 | [#23](https://github.com/kaylamenashe8/stonewake-final-repo/issues/23) | not started | | |
 | T24 | Tenders: open notice, Add / Dismiss | ui | P3 | [#24](https://github.com/kaylamenashe8/stonewake-final-repo/issues/24) | not started | | |
@@ -54,7 +54,7 @@ API to `tests/api/legacy-api/` ([#32](https://github.com/kaylamenashe8/stonewake
 ## Totals at export
 | Priority | Items | Merged | Open PR | Not started |
 |---|---|---|---|---|
-| P1 | 15 | 6 (T01, T10, T15, T16, T17, T18) | 3 (T02, T03, T08) | 6 |
+| P1 | 15 | 9 (T01, T02, T03, T08, T10, T15, T16, T17, T18) | 0 | 6 |
 | P2 | 13 | 2 (T20, T21) | 0 | 11 |
 | P3 | 6 | 0 | 0 | 6 |
-| **All** | **34** | **8** | **3** | **23** |
+| **All** | **34** | **11** | **0** | **23** |

@@ -24,8 +24,8 @@ Claude Code (Lead session + subagents in `.claude/agents/`), Playwright MCP, Pla
 | Test | Origin (crawler / Claude) | Promotion PR | Reviewing commit |
 |---|---|---|---|
 | T01 tests/e2e/dealbook/dealbook.filter-sector.spec.ts | crawler-generator (Claude Opus 5.5, aria snapshot + `/deals/list` XHR probe), 10/10 at 1 and 4 workers | #31 | 7f0beae (R1-R19 review fixes) |
-| T02 open a deal (briefing, key facts, view at source) | crawler-generator | #41 (open) | |
-| T03 Deal Book Export .xlsx | crawler-generator | #42 (open) | |
+| T02 tests/e2e/dealbook/dealbook.open-deal.spec.ts | crawler-generator | #41 | merged |
+| T03 tests/e2e/dealbook/dealbook.export-xlsx.spec.ts (PDF part kept in tests/generated/) | crawler-generator | #42 | merged |
 
 ## Key prompts
 ### Session 1: setup and product study (Claude Code, model Claude Opus 5.5, 17:30-18:10, run outside this repo so the hook did not log it)

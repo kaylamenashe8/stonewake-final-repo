@@ -26,11 +26,11 @@ Source: [BASELINE.md](BASELINE.md#product-profile).
 | ID | Area / flow | Business impact (1-5) | Likelihood (1-5) | Risk | Priority | Covered by |
 |---|---|---|---|---|---|---|
 | R1 | Login / session (all flows depend on it) | 5 | 3 | 15 | P1 | tests/e2e/auth/*, auth.setup.ts |
-| R2 | F1 Deal Book: filter, open, export | 5 | 3 | 15 | P1 | T01 (merged), T02, T03 (open PRs) |
+| R2 | F1 Deal Book: filter, open, export | 5 | 3 | 15 | P1 | T01, T02, T03 (merged) |
 | R3 | F6 API/MCP contracts and auth scheme | 4 | 4 | 16 | P1 | T16-T18, T20, T21, tests/api/legacy-api/* |
 | R4 | F2 Screenings: verdict cites sources, person never rated | 5 | 2 | 10 | P1 | T05, T06 (not started) |
 | R5 | F5 Monitoring/Portfolio incl. Sentiment (new on the day) | 4 | 4 | 16 | P1 | T15 (merged); T13, T30, T31 (not started); ui 10 portfolio |
-| R6 | F3 Network / F4 Countries: sourced data | 4 | 2 | 8 | P1 | T10 (merged), T08 (open PR); ui 8, ui 9 |
+| R6 | F3 Network / F4 Countries: sourced data | 4 | 2 | 8 | P1 | T08, T10 (merged); ui 8, ui 9 |
 | R7 | Security: XSS in inputs, key/role enforcement, cookies | 5 | 2 | 10 | P2 | T32-T34 (not started) |
 | R8 | Shared live workspace: data changes under the tests | 3 | 4 | 12 | - | Design rule: no live values asserted (FA8, F15, F17) |
 
@@ -62,16 +62,16 @@ Risk = impact x likelihood. Impact from JUDGES_FOCUS (six flows); likelihood fro
 | BASE-UI | Baseline ui 1-10 (login, terms, redirect, logout, sidebar, Deal Book, Countries, Institutions, Portfolio) | R1, R2, R6 | tests/e2e/auth/{login.signin,session.logout,session.redirect}.spec.ts, tests/e2e/modules/*.spec.ts | migrated, fixed (PR #37, #44) | none |
 | BASE-API | Baseline api 1-10 (health, me, auth errors, portfolio, entities, countries, search) | R3 | tests/api/legacy-api/*.spec.ts | migrated, fixed (PR #32) | none |
 | REQ-DEAL-01 | T01 sector filter narrows the Deal Book | R2 | tests/e2e/dealbook/dealbook.filter-sector.spec.ts | merged (PR #31) | none |
-| REQ-DEAL-02 | T02 open a deal: brief, key facts, source | R2 | in PR #41 | open PR | none |
-| REQ-DEAL-03 | T03 Export .xlsx | R2 | in PR #42 | open PR (PDF parked: 429) | none |
+| REQ-DEAL-02 | T02 open a deal: brief, key facts, source | R2 | tests/e2e/dealbook/dealbook.open-deal.spec.ts | merged (PR #41) | none |
+| REQ-DEAL-03 | T03 Export .xlsx | R2 | tests/e2e/dealbook/dealbook.export-xlsx.spec.ts | merged (PR #42); PDF part not promoted | none |
 | REQ-API-01 | T16 /health and /v1/health 404 | R3 | tests/api/health.get.spec.ts | merged (PR #36) | none |
 | REQ-API-02 | T17 deals list/detail/sort contract | R3 | tests/api/deals.{list,detail}.spec.ts | merged (PR #36) | none |
 | REQ-API-03 | T18 screenings, network, ownership | R3 | tests/api/{screenings.list,network.get,ownership.get}.spec.ts | merged (PR #36) | none |
 | REQ-API-05 | T20 422 envelope, rate-limit headers | R3 | tests/api/{deals.filters,ratelimit.headers}.spec.ts | merged (PR #36) | none |
-| REQ-API-06 | T21 MCP entity equals REST | R3 | tests/api/mcp.entity.spec.ts | merged (PR #36); knownBug test in PR #51 | [SPIRA-89](https://itac.spiraservice.net/33/Incident/89.aspx) (PR #45) |
+| REQ-API-06 | T21 MCP entity equals REST | R3 | tests/api/mcp.entity.spec.ts | merged (PR #36); SPIRA-89 knownBug test merged (PR #51) | [SPIRA-89](https://itac.spiraservice.net/33/Incident/89.aspx) (PR #45) |
 | REQ-CTY-01 | T10 country risk score and cited indicators | R6 | tests/e2e/countries/country-profile.risk-score.spec.ts | merged (PR #48) | none |
 | REQ-POR-01 | T15 Portfolio tiles equal /v1/portfolio/summary | R5 | tests/e2e/portfolio/portfolio.status-tiles.spec.ts | merged (PR #49) | none |
-| REQ-NET-01 | T08 company lookup: officers, cited relationships | R6 | in PR #52 | open PR | none |
+| REQ-NET-01 | T08 company lookup: officers, cited relationships | R6 | tests/e2e/network/network.company-lookup.spec.ts | merged (PR #52) | none |
 | REQ-SCR-01/02, REQ-MON-01/03/04, REQ-API-04 | Remaining P1 items | R4, R5 | none | not started | none |
 | REQ-SEC-01..03 | T32-T34 security | R7 | none | not started | none |
 
@@ -95,14 +95,14 @@ ci.yml (lint, typecheck, 4 shards, Pages, Slack, triage) · stability-gate.yml (
 | Shared production workspace, no data reset (J4) | Read-only by default; RUN_ID data + teardown; no exact counts | Applied in every merged test |
 | ToS 4(j) limits automated UI access | Competition workspace is the agreed target; API/MCP used where possible | Open question to judges (BASELINE) |
 | API key in traces (`Authorization` header) | REQUEST to the Architect: `trace: 'off'` for the `api` project (CHANGELOG) | Requested |
-| GitHub Pages not configured (API returns 404) | HTML report as CI artifact | Open |
-| Most P1 UI flows not automated (6 of 15 P1 items not started at 20:10) | Ranked plan; baseline suite stabilized first | Disclosed in TEST_PLAN.md |
+| GitHub Pages not configured until 20:15 | PR #46 publishes Pages from master | Closed: [report history](https://kaylamenashe8.github.io/stonewake-final-repo/) |
+| Most P1 UI flows not automated (6 of 15 P1 items not started at 20:20) | Ranked plan; baseline suite stabilized first | Disclosed in TEST_PLAN.md |
 
 ## 11. Schedule as executed
 | Planned | Actual | Phase | Notes |
 |---|---|---|---|
 | 18:00-18:20 | 18:06-18:20 | Recon | BASELINE measured on `b4f92c9`; plan T01-T27 (PR #29) |
 | 18:20-19:50 | 18:20-19:50 | Parallel lanes | Merged: #31 T01, #32 API migration, #35 env/lint, #36 API T16-T21, #37/#44 UI migration, #38 pre-PR gate; judge updates D17/D18 added T28-T34 (#30) |
-| 19:50-20:20 | 19:50- | Integrate | Merged #48 T10, #49 T15, #50 Spira env; open: #41 T02, #42 T03, #45 SPIRA-89, #46 CI Pages, #47 triage, #51 SPIRA-89 test, #52 T08 |
+| 19:50-20:20 | 19:50-20:20 | Integrate | Merged #41 T02, #42 T03, #45 SPIRA-89, #46 CI Pages + API key, #47 triage, #48 T10, #49 T15, #50 Spira env, #51 SPIRA-89 test, #52 T08 |
 | 20:20-20:40 | | Freeze + final gate | |
 | 20:40-20:55 | | Wrap-up | |

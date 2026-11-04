@@ -14,7 +14,7 @@ This is the test automation project for **Stonewake**, our product. It contains 
 ### Before -> after
 | Metric | Before (`b4f92c9`, [BASELINE.md](docs/BASELINE.md)) | After |
 |---|---|---|
-| Tests | 20 (10 UI, 10 API) | The 20 baseline tests (moved, none removed) + plan items T01, T10, T15, T16, T17, T18, T20, T21 ([TEST_PLAN.md](docs/TEST_PLAN.md)) |
+| Tests | 20 (10 UI, 10 API) | The 20 baseline tests (moved, none removed) + plan items T01, T02, T03, T08, T10, T15, T16, T17, T18, T20, T21 ([TEST_PLAN.md](docs/TEST_PLAN.md)) |
 | Passing, 5 runs, retries 0, 4 workers | 10/20 pass 5/5; 10 fail 0/5; 0 flaky | Pending: final Stability Gate (20:20-20:40) |
 | Lint | 177 errors, 54 warnings | 0 errors, `--max-warnings=0` (D16, enforced by `npm run pre-pr` on every PR) |
 | Hard waits | 3 `waitForTimeout` | 0 (F5, F18) |
@@ -27,14 +27,14 @@ This is the test automation project for **Stonewake**, our product. It contains 
 ### Stability Gate
 - Rules: 5 independent full-suite runs of one commit, retries 0, `HEAL_MODE=strict` (any self-heal fails the run) (D2, D3, D5).
 - Latest gate run: [41877426539](https://github.com/kaylamenashe8/stonewake-final-repo/actions/runs/41877426539), **failed** (on `e745779`: UI migration #37 merged, API migration #32, #36 and UI review fixes #44 not yet). The final run link and its 5/5 result go here at 20:20-20:40.
-- HTML report and history: GitHub Pages is not enabled on this repo yet; each CI run uploads the Playwright HTML report as an artifact.
+- HTML report: [latest run](https://kaylamenashe8.github.io/stonewake-final-repo/latest/) · history of every run and gate: [Pages index](https://kaylamenashe8.github.io/stonewake-final-repo/) (GitHub Pages, published by ci.yml).
 
 ### Known product bugs
 Recorded in [BUGS.md](docs/BUGS.md) (system of record: SpiraTest, D10).
 
 | Spira | Bug | Severity | Test |
 |---|---|---|---|
-| [SPIRA-89](https://itac.spiraservice.net/33/Incident/89.aspx) | MCP: tool call without credential answers HTTP 401, docs say HTTP 200 for -32001 | low | tests/api/mcp.entity.spec.ts (knownBug test in PR #51) |
+| [SPIRA-89](https://itac.spiraservice.net/33/Incident/89.aspx) | MCP: tool call without credential answers HTTP 401, docs say HTTP 200 for -32001 | low | tests/api/mcp.entity.spec.ts (`knownBug('SPIRA-89')` test, PR #51) |
 
 None of the 10 baseline failures was a product bug: all were automation faults ([FIXES.md](docs/FIXES.md)).
 
