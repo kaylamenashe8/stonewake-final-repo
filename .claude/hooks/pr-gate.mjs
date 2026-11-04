@@ -16,7 +16,11 @@ try {
 } catch {
   process.exit(0);
 }
-const cmd = String(p.tool_input?.command ?? '');
+// Look at the shell structure only: heredoc bodies and quoted text with spaces (PR bodies, commit messages)
+// may mention `git push` / `gh pr ready` without running them.
+const cmd = String(p.tool_input?.command ?? '')
+  .replace(/<<-?\s*['"]?(\w+)['"]?[\s\S]*?\n\s*\1\b/g, '<<HEREDOC')
+  .replace(/"(?:[^"\\]|\\.)*\s(?:[^"\\]|\\.)*"|'[^']*\s[^']*'/g, '""');
 const gated = /\bgit\s+(-C\s+\S+\s+)?push\b|\bgh\s+pr\s+(create|ready)\b/.test(cmd);
 if (p.tool_name !== 'Bash' || !gated) process.exit(0);
 if (/\bgit\s+push\b[^;&|]*--(delete|tags)\b/.test(cmd)) process.exit(0);
