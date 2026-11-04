@@ -38,7 +38,7 @@ Notes
 - 401 body is uniform: `{"error":{"code":"unauthenticated","message":"Missing or invalid credentials."}}`.
 - 403 "wrong role" is not testable with one viewer key except through write verbs (T19) and scope-gated routes (`/v1/audit-log.csv` needs `audit`; our key lacks it).
 - Open question for the judges: docs say a malformed `team` gives 422, but `team=abc` gives 403 `forbidden` (only `team=` empty gives 422). Team-id format is not documented, so not filed as a bug; the spec pins only the well-formed foreign-team 403.
-- MCP: with no key a tool call answers JSON-RPC -32001 with **HTTP 401**; the docs' error table says HTTP 200. Open question for the judges (doc vs behaviour), the spec pins only the JSON-RPC code. MCP URL is a constant in `src/api/mcp.ts` until `MCP_URL` joins the env contract.
+- MCP: with no key a tool call answers JSON-RPC -32001 with **HTTP 401**; the docs' error table says HTTP 200. Filed as SPIRA-89; the documented behaviour is pinned by a @known-bug test in `tests/api/mcp.entity.spec.ts` (skipped until fixed), the existing test pins only the JSON-RPC code. MCP URL is a constant in `src/api/mcp.ts` until `MCP_URL` joins the env contract.
 - Network `limit` caps neighbour nodes, not edges (limit=20 -> 21 nodes incl. centre, 22 edges). Docs do not say which; not filed as a bug.
 - T18 UI-vs-API parity (same owners/officers on the Network page) is offered to Coverage: pick the node via `heldCompanyNodeId()` (`src/api/live-picks.ts`).
 - Response time is logged per call as the `api-timing` annotation (warning only).
