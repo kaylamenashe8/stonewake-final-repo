@@ -16,6 +16,7 @@ test.describe('Portfolio', () => {
       await expect(portfolio.tile(key)).toHaveText(/\d+/);
     }
 
+    // first(): any company in the book will do; the test does not assume which ones exist (C4).
     const company = portfolio.companyLinks().first();
     await expect(company).toBeVisible();
     const name = (await company.innerText()).trim();

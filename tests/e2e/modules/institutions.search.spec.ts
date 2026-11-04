@@ -3,7 +3,7 @@ import { requirement } from '../../../src/utils/annotations';
 import { InstitutionsPage } from '../../../src/pages/InstitutionsPage';
 
 test.describe('Institutions', () => {
-  test('ui 9 institutions: should narrow the list to the searched institution and open its page @regression', async ({
+  test('ui 9 institutions: should list only the searched institution and open its page when it is clicked @regression', async ({
     page,
   }) => {
     requirement('REQ-INST-01');
