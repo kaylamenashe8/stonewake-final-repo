@@ -15,7 +15,7 @@
 | `/v1/nodes/{id}/network` | GET | bearer | F3 Network | P1 (T18) | `src/api/schemas/network.ts` | `tests/api/network.get.spec.ts` | covered |
 | `/v1/nodes/{id}/ownership-chain` | GET | bearer | F3 Network (ownership) | P1 (T18) | `src/api/schemas/ownership.ts` | `tests/api/ownership.get.spec.ts` | covered |
 | `/v1/nodes/{id}/company` | GET | bearer | F3 Network profile | P2 | - | - | open |
-| write verbs on `/v1/*` | POST/PUT/PATCH/DELETE | bearer | - (read-only API) | P1 (T19) | `ErrorEnvelope` | - | blocked: live write-verb probes need Kayla's approval |
+| write verbs on `/v1/deals`, `/v1/deals/{id}`; `POST /org/api-keys/{id}/revoke` | POST/PUT/PATCH/DELETE | bearer (viewer) | - (read-only API) | P1 (T19) | `ErrorEnvelope`, `OrgErrorEnvelope` | `tests/api/readonly.write.spec.ts` | covered: 405 `method_not_allowed` + `Allow: GET` on /v1 (no write route exists, openapi.json); 401 on /org (session-only). Plan expected 403 |
 | `/v1/countries`, `/v1/countries/{iso3}` | GET | bearer | F4 Countries | P2 | - | api 9 (Stabilizer S2) | existing |
 | `/v1/portfolio`, `/summary` | GET | bearer | F5 Portfolio | P2 | `src/api/schemas/portfolio.ts` (minimal row) | api 5, 6 (Stabilizer S2); used to pick a held company | existing |
 | `/v1/entities`, `/v1/entities/{id}` | GET | bearer | F3 Institutions | P2 | - | api 7, 8 (Stabilizer S2) | existing |
