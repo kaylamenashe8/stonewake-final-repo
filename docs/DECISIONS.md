@@ -19,6 +19,7 @@
 | D14 | Keep the given default branch `master`; the kit's workflows, scripts and agents point at `master`. | Kayla's preference; no surprise for the judges comparing with the original repo. |
 | D15 | Test only in our own workspace (Finalist 4, kaylamenashe@gmail.com); never the judges' or other finalists' accounts. API key role is `viewer`. | Each finalist has a workspace with the same starting data; writes in shared workspaces would affect others. |
 | D13 | Every agent works in its own git worktree and branch and owns specific directories; merge order is fixed. | Parallel agents on one tree create conflicts and lost work. |
+| D16 | Lint stays at `error` with `--max-warnings=0`; the two legacy baseline specs (`tests/api.spec.ts`, `tests/ui.spec.ts`, 177 errors + 54 warnings) are in the ESLint ignore list until the Stabilizers move them. Moved files are linted in full. | Every non-legacy file is already clean at `error`, so `LINT_LEVEL=warn` would only hide new problems (and `--max-warnings=0` fails on warnings anyway). The ignore matches only the old paths, so it lapses on its own when the files move; remove it then. |
 
 ## Judge answers (17:50-18:00 — write answers here immediately)
 | # | Question | Answer | Changes decision |
