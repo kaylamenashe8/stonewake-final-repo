@@ -20,7 +20,7 @@
 | `/v1/portfolio`, `/summary` | GET | bearer | F5 Portfolio | P2 | `src/api/schemas/portfolio.ts` (minimal row) | api 5, 6 (Stabilizer S2); used to pick a held company | existing |
 | `/v1/entities`, `/v1/entities/{id}` | GET | bearer | F3 Institutions | P2 | - | api 7, 8 (Stabilizer S2) | existing |
 | `/v1/search` | GET | bearer | F3 Network lookup | P2 | - | api 10 (Stabilizer S2) | existing |
-| MCP `https://mcp.stonewake.ai/` | POST (JSON-RPC) | bearer | F6 | P2 (T21) | - | - | open |
+| MCP `https://mcp.stonewake.ai/` `tools/call company_profile`, `tools/list` | POST (JSON-RPC, read-only tools) | bearer (tools/list keyless) | F6 API+MCP parity | P2 (T21) | `src/api/schemas/mcp.ts` | `tests/api/mcp.entity.spec.ts` | covered (entity parity with REST) |
 
 ## Coverage per endpoint
 | Endpoint | Happy | Auth (401/403) | Validation (422) | CRUD | 404 | Headers | p50 ms |
@@ -38,6 +38,7 @@ Notes
 - 401 body is uniform: `{"error":{"code":"unauthenticated","message":"Missing or invalid credentials."}}`.
 - 403 "wrong role" is not testable with one viewer key except through write verbs (T19) and scope-gated routes (`/v1/audit-log.csv` needs `audit`; our key lacks it).
 - Open question for the judges: docs say a malformed `team` gives 422, but `team=abc` gives 403 `forbidden` (only `team=` empty gives 422). Team-id format is not documented, so not filed as a bug; the spec pins only the well-formed foreign-team 403.
+- MCP: with no key a tool call answers JSON-RPC -32001 with **HTTP 401**; the docs' error table says HTTP 200. Open question for the judges (doc vs behaviour), the spec pins only the JSON-RPC code. MCP URL is a constant in `src/api/mcp.ts` until `MCP_URL` joins the env contract.
 - Network `limit` caps neighbour nodes, not edges (limit=20 -> 21 nodes incl. centre, 22 edges). Docs do not say which; not filed as a bug.
 - T18 UI-vs-API parity (same owners/officers on the Network page) is offered to Coverage: pick the node via `heldCompanyNodeId()` (`src/api/live-picks.ts`).
 - Response time is logged per call as the `api-timing` annotation (warning only).

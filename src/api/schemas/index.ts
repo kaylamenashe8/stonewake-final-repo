@@ -6,3 +6,4 @@ export * from './portfolio';
 export * from './screenings';
 export * from './network';
 export * from './ownership';
+export * from './mcp';
