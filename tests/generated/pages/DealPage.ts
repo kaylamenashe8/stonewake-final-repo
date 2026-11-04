@@ -46,7 +46,10 @@ export class DealPage extends BasePage {
     return this.el(this.title);
   }
 
-  /** External links cited under the Briefing ("AI drafted from the cited sources · …"). */
+  /**
+   * External links cited under the Briefing ("AI drafted from the cited sources · …"). A collection, so a
+   * plain scoped locator rather than an ElementSpec (the healer resolves single elements only).
+   */
   briefingSourceLinks(): Locator {
     return this.page
       .getByRole('main')
@@ -55,7 +58,7 @@ export class DealPage extends BasePage {
       .getByRole('link');
   }
 
-  /** Key facts as term -> value (e.g. Sector -> "Mining & metals"). */
+  /** Key facts as term -> value (e.g. Sector -> "Mining & metals"); read as a whole list, like briefingSourceLinks. */
   async keyFacts(): Promise<Record<string, string>> {
     await this.el(this.keyFactsHeading);
     const main = this.page.getByRole('main');
