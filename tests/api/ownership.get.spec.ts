@@ -36,7 +36,7 @@ test.describe('API ownership chain @api', () => {
     ['threshold', '100.5', 'less_than_equal'],
     ['max_depth', '9', 'less_than_equal'],
   ] as const) {
-    test(`should refuse ${param}=${value} with a 422 naming ${param}`, async ({ api }) => {
+    test(`should return a 422 naming ${param} when ${param}=${value}`, async ({ api }) => {
       requirement('REQ-API-03');
       const nodeId = await heldCompanyNodeId(api);
       const res = await api.call('GET', `/v1/nodes/${nodeId}/ownership-chain`, { params: { [param]: value } });

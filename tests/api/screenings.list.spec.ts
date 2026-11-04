@@ -30,7 +30,7 @@ test.describe('API screenings @api', () => {
     ['iso3', 'deu'],
     ['subject_type', 'bogus'],
   ] as const) {
-    test(`should refuse ${param}=${value} with a 422 naming ${param}`, async ({ api }) => {
+    test(`should return a 422 naming ${param} when ${param}=${value}`, async ({ api }) => {
       requirement('REQ-API-03');
       const res = await api.call('GET', '/v1/screenings', { params: { [param]: value } });
 
@@ -39,7 +39,7 @@ test.describe('API screenings @api', () => {
     });
   }
 
-  test('should refuse a non-integer screening id with a 422 naming the path parameter', async ({ api }) => {
+  test('should return a 422 naming the path parameter when the screening id is not an integer', async ({ api }) => {
     requirement('REQ-API-03');
     const res = await api.call('GET', '/v1/screenings/abc');
 

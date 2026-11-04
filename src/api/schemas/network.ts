@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-export const EDGE_TYPES = ['officer_of', 'shareholder_of', 'parent_of', 'ultimate_parent_of'] as const;
-
 export const NetworkNodeSchema = z
   .object({
     node_id: z.number().int(),

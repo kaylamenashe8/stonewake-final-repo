@@ -39,7 +39,7 @@ test.describe('API company network @api', () => {
     ['edge_types', 'bogus', 'literal_error'],
     ['limit', '201', 'less_than_equal'],
   ] as const) {
-    test(`should refuse ${param}=${value} with a 422 naming ${param}`, async ({ api }) => {
+    test(`should return a 422 naming ${param} when ${param}=${value}`, async ({ api }) => {
       requirement('REQ-API-03');
       const nodeId = await heldCompanyNodeId(api);
       const res = await api.call('GET', `/v1/nodes/${nodeId}/network`, { params: { [param]: value } });

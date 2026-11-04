@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+// Strictness policy: small, fully documented bodies (health, error envelopes) are strictObject, so an
+// extra or missing key fails. Large live payloads (deals, network, ownership) pin the contract fields
+// we assert on and tolerate additive fields, so a new product field does not break the suite.
+
 /** Every non-validation error: `{error:{code,message}}` (401 unauthenticated, 403 forbidden, 404 not_found). */
 export const ErrorEnvelope = z.strictObject({
   error: z.strictObject({ code: z.string().min(1), message: z.string().min(1) }),

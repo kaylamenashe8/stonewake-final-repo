@@ -1,8 +1,6 @@
 import { z } from 'zod';
 import { listEnvelope } from './common';
 
-export const DEAL_SORTS = ['priority', 'score', 'value', 'last_activity', 'stage', 'name', 'first_seen', 'latest_update'] as const;
-
 const iso = z.iso.datetime({ offset: true });
 
 /** One Deal Book row (`GET /v1/deals` item). Only contract fields we rely on; extra fields are allowed. */

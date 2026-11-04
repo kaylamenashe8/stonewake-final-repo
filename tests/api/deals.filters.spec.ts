@@ -21,7 +21,7 @@ test.describe('API deals filters @api', () => {
   });
 
   for (const { param, value, type } of invalidFilters) {
-    test(`should refuse ${param}=${value.slice(0, 12)}${value.length > 12 ? '…' : ''} with a 422 naming ${param}`, async ({ api }) => {
+    test(`should refuse ${param}=${value.slice(0, 12)}${value.length > 12 ? '…' : ''} with a 422 naming ${param} when the filter is invalid`, async ({ api }) => {
       requirement('REQ-API-05');
       const res = await api.call('GET', '/v1/deals', { params: { [param]: value } });
 
@@ -32,7 +32,7 @@ test.describe('API deals filters @api', () => {
     });
   }
 
-  test('should accept the boundary values q of 128 chars and country_code XKX', async ({ api }) => {
+  test('should return 200 when q is 128 chars and country_code is XKX', async ({ api }) => {
     requirement('REQ-API-05');
     const longQ = await api.call('GET', '/v1/deals', { schema: DealListSchema, params: { q: 'a'.repeat(128), limit: 1 } });
     const kosovo = await api.call('GET', '/v1/deals', { schema: DealListSchema, params: { country_code: 'XKX', limit: 1 } });

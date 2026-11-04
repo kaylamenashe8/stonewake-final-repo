@@ -4,7 +4,7 @@ import { apiKey } from '../../src/api/auth';
 
 // T20 (#20), REQ-API-05. Headers only: one request per test, the limit itself is never probed (ToS 4(g)).
 test.describe('API rate-limit headers @api', () => {
-  test('should send RateLimit and x-ratelimit headers on a keyed /v1 response', async ({ api }) => {
+  test('should send RateLimit and x-ratelimit headers when a keyed /v1 request is made', async ({ api }) => {
     requirement('REQ-API-05');
     api.setToken(apiKey());
     const res = await api.call('GET', '/v1/me');
@@ -18,7 +18,7 @@ test.describe('API rate-limit headers @api', () => {
     expect(res.headers['x-ratelimit-reset']).toMatch(/^\d+$/);
   });
 
-  test('should send a RateLimit-Policy on a /v1 response even without a key', async ({ api }) => {
+  test('should send a RateLimit-Policy when a /v1 request has no key', async ({ api }) => {
     requirement('REQ-API-05');
     const res = await api.call('GET', '/v1/me');
 
