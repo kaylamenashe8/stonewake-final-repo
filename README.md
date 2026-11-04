@@ -44,6 +44,28 @@ Recorded in [BUGS.md](docs/BUGS.md) (system of record: SpiraTest, D10).
 
 None of the 10 baseline failures was a product bug: all were automation faults ([FIXES.md](docs/FIXES.md)).
 
+### Next steps (planned, not done by the 20:20 freeze)
+Ordered by value. Item status is in [TEST_PLAN.md](docs/TEST_PLAN.md).
+
+1. **Triage on pull requests.** Today the `triage` job in `ci.yml` runs on failed master pushes but is skipped on failed PR runs.
+   The suspected cause is the fork guard `github.event.pull_request.head.repo.fork != true`. The fix is ready but not applied:
+   `if: ${{ failure() && needs.test.result == 'failure' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}`.
+   This still keeps fork PRs away from secrets. It was skipped because it is a CI change after the freeze and can only be proven
+   by a PR run with a failing test. To finish: merge the guard, open one PR with a forced failure, check the verdict in the job
+   summary, in Slack and in the `triage-verdicts` artifact, then drop the failure (about 25-45 min).
+2. **Claude step of the triage ladder.** It is skipped because no `ANTHROPIC_API_KEY` or `CLAUDE_CODE_OAUTH_TOKEN` secret is set.
+   Add one.
+3. **API key in traces.** The `Authorization` header can land in `retain-on-failure` traces. Set `trace: 'off'` for the `api` project
+   (requested, not applied).
+4. **Remaining P1 items:** T05 and T06 (Screenings), T13 (Monitoring add/remove, deferred because its remove step is a destructive
+   click that was not approved), T30 and T31 (Monitoring Sentiment). Also the PDF half of T03, parked on HTTP 429 in `tests/generated/`.
+5. **P2 items:** T04, T07, T09, T11, T12, T14, T22, T23, plus the security items T32, T33 and T34.
+6. **P3 items:** T24, T25, T28, T29, plus T26 (axe) and T27 (visual), which extend the kit's home-page checks to the key pages.
+   Visual baselines must be generated in Docker.
+7. **Plan hygiene:** create GitHub issues for T28-T34 (`npm run plan:issues`).
+8. **Wider checks:** a reversed-order run of the suite to prove test independence (not done in [BASELINE.md](docs/BASELINE.md)),
+   and Firefox and WebKit projects (Chromium only today).
+
 ### Documents
 - [Software Test Plan (STP)](docs/STP.md): scope, risks, traceability, entry/exit criteria
 - [Test plan export](docs/TEST_PLAN.md): items T01-T34, status, files, PRs

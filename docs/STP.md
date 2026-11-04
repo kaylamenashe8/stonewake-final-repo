@@ -94,9 +94,10 @@ ci.yml (lint, typecheck, 4 shards, Pages, Slack, triage) · stability-gate.yml (
 | CI runners: at recon every run since 17:54 was `queued` and `workflow_dispatch` returned 403 (BASELINE); runs executed later | Local gate worktree as backup; `stability-gate.yml` (D2) | Latest CI Stability Gate run [41877426539](https://github.com/kaylamenashe8/stonewake-final-repo/actions/runs/41877426539) completed: failure (4/5 jobs failed, 1 not concluded) |
 | Shared production workspace, no data reset (J4) | Read-only by default; RUN_ID data + teardown; no exact counts | Applied in every merged test |
 | ToS 4(j) limits automated UI access | Competition workspace is the agreed target; API/MCP used where possible | Open question to judges (BASELINE) |
-| API key in traces (`Authorization` header) | REQUEST to the Architect: `trace: 'off'` for the `api` project (CHANGELOG) | Requested |
+| API key in traces (`Authorization` header) | REQUEST to the Architect: `trace: 'off'` for the `api` project (CHANGELOG) | Requested, not applied: README Next steps item 3 |
 | GitHub Pages not configured until 20:15 | PR #46 publishes Pages from master | Closed: [report history](https://kaylamenashe8.github.io/stonewake-final-repo/) |
-| Most P1 UI flows not automated (6 of 15 P1 items not started at 20:20) | Ranked plan; baseline suite stabilized first | Disclosed in TEST_PLAN.md |
+| Most P1 UI flows not automated (5 of 15 P1 items not started at 20:20) | Ranked plan; baseline suite stabilized first | Disclosed in TEST_PLAN.md; README [Next steps](../README.md#next-steps-planned-not-done-by-the-2020-freeze) |
+| Triage job skipped on failed PR runs (fork guard in ci.yml); runs on master failures only | Guard fix drafted (same-repo check, keeps forks out); needs one forced-failure PR run to prove | Open, after freeze: README Next steps item 1 |
 
 ## 11. Schedule as executed
 | Planned | Actual | Phase | Notes |

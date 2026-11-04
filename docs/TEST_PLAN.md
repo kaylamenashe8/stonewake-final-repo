@@ -29,7 +29,7 @@ No test starts after 20:00 (TIMELINE), so every item still "not started" at 20:0
 | T16 | API: /health ok, /v1/health 404 envelope | api | P1 | [#10](https://github.com/kaylamenashe8/stonewake-final-repo/issues/10) | merged | tests/api/health.get.spec.ts | [#36](https://github.com/kaylamenashe8/stonewake-final-repo/pull/36) |
 | T17 | API: deals list, detail, sort contract (zod) | api | P1 | [#11](https://github.com/kaylamenashe8/stonewake-final-repo/issues/11) | merged | tests/api/deals.list.spec.ts, tests/api/deals.detail.spec.ts | [#36](https://github.com/kaylamenashe8/stonewake-final-repo/pull/36) |
 | T18 | API: screenings, network, ownership contracts | api | P1 | [#12](https://github.com/kaylamenashe8/stonewake-final-repo/issues/12) | merged | tests/api/screenings.list.spec.ts, tests/api/network.get.spec.ts, tests/api/ownership.get.spec.ts | [#36](https://github.com/kaylamenashe8/stonewake-final-repo/pull/36) |
-| T19 | API: viewer key is read-only (403 on writes) | api | P1 | [#13](https://github.com/kaylamenashe8/stonewake-final-repo/issues/13) | not started | | |
+| T19 | API: viewer key is read-only (writes refused with 405, not the planned 403) | api | P1 | [#13](https://github.com/kaylamenashe8/stonewake-final-repo/issues/13) | merged (Lead override past the 20:00 cutoff) | tests/api/readonly.write.spec.ts | [#54](https://github.com/kaylamenashe8/stonewake-final-repo/pull/54) |
 | T20 | API: 422 envelope on bad filters; rate-limit headers | api | P2 | [#20](https://github.com/kaylamenashe8/stonewake-final-repo/issues/20) | merged | tests/api/deals.filters.spec.ts, tests/api/ratelimit.headers.spec.ts | [#36](https://github.com/kaylamenashe8/stonewake-final-repo/pull/36) |
 | T21 | MCP: same entity as REST | api | P2 | [#21](https://github.com/kaylamenashe8/stonewake-final-repo/issues/21) | merged; SPIRA-89 knownBug test merged | tests/api/mcp.entity.spec.ts | [#36](https://github.com/kaylamenashe8/stonewake-final-repo/pull/36), [#51](https://github.com/kaylamenashe8/stonewake-final-repo/pull/51) |
 | T22 | Auth: session persists, deep link after login | auth | P2 | [#22](https://github.com/kaylamenashe8/stonewake-final-repo/issues/22) | not started | | |
@@ -54,7 +54,9 @@ API to `tests/api/legacy-api/` ([#32](https://github.com/kaylamenashe8/stonewake
 ## Totals at export
 | Priority | Items | Merged | Open PR | Not started |
 |---|---|---|---|---|
-| P1 | 15 | 9 (T01, T02, T03, T08, T10, T15, T16, T17, T18) | 0 | 6 |
+| P1 | 15 | 10 (T01, T02, T03, T08, T10, T15, T16, T17, T18, T19) | 0 | 5 |
 | P2 | 13 | 2 (T20, T21) | 0 | 11 |
 | P3 | 6 | 0 | 0 | 6 |
-| **All** | **34** | **11** | **0** | **23** |
+| **All** | **34** | **12** | **0** | **22** |
+
+Next steps for the items not started, and for CI follow-ups, are in the README: [Next steps](../README.md#next-steps-planned-not-done-by-the-2020-freeze).
