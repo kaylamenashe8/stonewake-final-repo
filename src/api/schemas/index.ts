@@ -2,3 +2,7 @@ export * from './common';
 export * from './health';
 export * from './me';
 export * from './deals';
+export * from './portfolio';
+export * from './screenings';
+export * from './network';
+export * from './ownership';
