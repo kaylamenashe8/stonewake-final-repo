@@ -11,6 +11,9 @@ export const DEAL_ORDERS = {
 } as const;
 export type DealOrder = keyof typeof DEAL_ORDERS;
 
+/** Deal Book list endpoint; every Order change re-requests it with `?sort=<order>`. */
+const DEALS_LIST_PATH = '/deals/list';
+
 /** Only the field this check reads from POST /deals/list; the full contract is the API lane's. */
 const dealsListIds = z.object({ items: z.array(z.object({ deal_id: z.string().min(1) })) });
 
@@ -23,7 +26,11 @@ const SCORE_NAME = /^Relevance score (\d+) of 100$/;
  */
 export class DealBookOrder extends DealBookPage {
   readonly filtersButton = element('Deal Book > Filters', by.role('button', 'Filters'));
-  readonly orderSelect = element('Deal Book > Filters > Order', by.role('combobox', 'Order'), by.label('Order'));
+  readonly orderSelect = element(
+    'Deal Book > Filters > Order',
+    by.role('combobox', 'Order'),
+    by.label('Order'),
+  );
 
   /**
    * Opens Filters, picks an Order option and returns the deal paths (/deals/<id>) in the order the
@@ -35,7 +42,9 @@ export class DealBookOrder extends DealBookPage {
     const select = await this.el(this.orderSelect);
     const response = this.page.waitForResponse(
       (r: Response) =>
-        r.request().method() === 'POST' && r.url().includes('/deals/list') && r.url().includes(`sort=${order}`),
+        r.request().method() === 'POST' &&
+        r.url().includes(DEALS_LIST_PATH) &&
+        r.url().includes(`sort=${order}`),
     );
     await select.selectOption({ label: DEAL_ORDERS[order] });
     const { items } = dealsListIds.parse(await (await response).json());
@@ -43,7 +52,7 @@ export class DealBookOrder extends DealBookPage {
   }
 
   /** Paths of the visible deal links, top to bottom. */
-  async visibleDealPaths(): Promise<string[]> {
+  visibleDealPaths(): Promise<string[]> {
     return this.dealLinks().evaluateAll((links) => links.map((a) => a.getAttribute('href') ?? ''));
   }
 
@@ -55,23 +64,36 @@ export class DealBookOrder extends DealBookPage {
 
   /** Relevance scores top to bottom, read from each row's score badge. */
   async visibleScores(): Promise<number[]> {
-    const names = await this.scoreBadges().evaluateAll((imgs) => imgs.map((i) => i.getAttribute('aria-label') ?? ''));
+    const names = await this.scoreBadges().evaluateAll((imgs) =>
+      imgs.map((i) => i.getAttribute('aria-label') ?? ''),
+    );
     return names.map((n) => Number.parseInt(SCORE_NAME.exec(n)?.[1] ?? '', 10));
   }
 
   /** "Last activity" dates top to bottom (cells read "3 Nov 2026"), as epoch milliseconds. */
   async visibleLastActivity(): Promise<number[]> {
-    const headers = await this.page.getByRole('main').getByRole('table').getByRole('columnheader').allInnerTexts();
-    const column = headers.findIndex((h) => h.trim().toLowerCase() === 'last activity');
+    const headers = await this.page
+      .getByRole('main')
+      .getByRole('table')
+      .getByRole('columnheader')
+      .allInnerTexts();
+    const column = headers.findIndex(
+      (h) => h.trim().toLowerCase() === DEAL_ORDERS.last_activity.toLowerCase(),
+    );
     if (column < 0) throw new Error('Deal Book: no "Last activity" column');
     // Cells have no accessible name; match them to the header by cellIndex (CSS scoped to the deal rows).
-    const cells = await this.dealRows().locator('td').evaluateAll(
-      (tds, col) =>
-        tds
-          .filter((td) => (td as HTMLTableCellElement).cellIndex === col)
-          .map((td) => td.textContent.trim()),
-      column,
-    );
+    const cells = await this.dealRows()
+      .locator('td')
+      .evaluateAll(
+        (tds, col) =>
+          tds
+            .filter(
+              (td): td is HTMLTableCellElement => td instanceof HTMLTableCellElement && td.cellIndex === col,
+            )
+            .map((td) => td.textContent.trim()),
+        column,
+      );
+    // "3 Nov 2026 UTC" parses the same on every machine; a cell that is not a date gives NaN, which the test rejects.
     return cells.map((c) => Date.parse(`${c} UTC`));
   }
 

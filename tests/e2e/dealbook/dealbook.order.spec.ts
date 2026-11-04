@@ -1,6 +1,6 @@
-import { test, expect } from '../../src/fixtures';
-import { requirement } from '../../src/utils/annotations';
-import { DealBookOrder } from './pages/DealBookOrder';
+import { test, expect } from '../../../src/fixtures';
+import { aiGenerated, requirement } from '../../../src/utils/annotations';
+import { DealBookOrder } from '../../generated/pages/DealBookOrder';
 
 /** Non-increasing (highest or newest first); ties keep any order. */
 const descending = (values: number[]): number[] => [...values].sort((a, b) => b - a);
@@ -10,6 +10,7 @@ const collator = new Intl.Collator('en', { sensitivity: 'base' });
 test.describe('Deal Book order @regression', () => {
   test('should list deals from highest to lowest score when the order is Score', async ({ page }) => {
     requirement('T04');
+    aiGenerated('10218d1');
     const dealBook = new DealBookOrder(page);
     await dealBook.open();
 
@@ -28,6 +29,7 @@ test.describe('Deal Book order @regression', () => {
 
   test('should list deals alphabetically by name when the order is Name', async ({ page }) => {
     requirement('T04');
+    aiGenerated('10218d1');
     const dealBook = new DealBookOrder(page);
     await dealBook.open();
 
@@ -43,8 +45,11 @@ test.describe('Deal Book order @regression', () => {
     });
   });
 
-  test('should list the most recently active deals first when the order is Last activity', async ({ page }) => {
+  test('should list the most recently active deals first when the order is Last activity', async ({
+    page,
+  }) => {
     requirement('T04');
+    aiGenerated('10218d1');
     const dealBook = new DealBookOrder(page);
     await dealBook.open();
 
