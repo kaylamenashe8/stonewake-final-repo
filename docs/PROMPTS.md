@@ -5,10 +5,10 @@ plus the prompts the Lead session delegated to subagents and the messages it sen
 Exported from the Claude Code session transcripts by `scripts/export-prompts.mjs`; secrets are redacted.
 Curated highlights and how AI was used: `docs/AI_LOG.md`.
 
-- Prompts by Kayla: 59
-- Prompts delegated to subagents: 14
-- Messages to running agents: 9
-- Sessions: 10 (manager-tools session d15dc9d0, repo session fd1bc6fd, repo session e2a9bded, repo session 6f51fc43, repo session 183b3583, repo session 63614cc0, repo session 1c473233, manager-tools session ced94a79, repo session 86c9d820, manager-tools session 6d3b62a6)
+- Prompts by Kayla: 103
+- Prompts delegated to subagents: 20
+- Messages to running agents: 26
+- Sessions: 14 (manager-tools session d15dc9d0, repo session fd1bc6fd, repo session e2a9bded, repo session 6f51fc43, repo session 183b3583, repo session 63614cc0, repo session 1c473233, manager-tools session ced94a79, repo session 86c9d820, manager-tools session 6d3b62a6, manager-tools session 948e0a84, repo session 8e3183fb, repo session 27d75d39, repo session f994c96c)
 - Not listed: the standing run-sheet refresh prompt that a scheduled job re-sent every 5 minutes.
 
 ## Key prompts
@@ -984,4 +984,423 @@ Curated highlights and how AI was used: `docs/AI_LOG.md`.
 
 > I also have this new requirement - @all 
 > Hey folks, one more thing: please include a Markdown (.md) file with the prompts you used during the competition and add it to your repository. With AI tools available, pulling together a quick log of your key prompts shouldn't take much time at all!
+
+### 19:24 · Kayla · manager-tools session 948e0a84
+
+> run the gate that was meant to be run at 19:00
+
+### 19:29 · Kayla · manager-tools session 6d3b62a6
+
+> what is going on here: The first gate is running now. It's the one the run sheet set for 19:15 (/gate parallel), started at 19:26 on stonewake-final-repo master (e745779, the PR #37 merge). It runs the full suite 5 times in parallel, w
+
+### 19:29 · Kayla · manager-tools session 6d3b62a6
+
+> what is going on here: LanesNot started since 18:20: ci-infra, triage, coverage, bug-reporter, scribe.
+> Start them in Claude Code (/stabilize, or "start the <lane> agent").
+
+### 19:33 · Kayla · repo session 63614cc0
+
+> these happen in the product? ❯ go ahead and file these
+
+### 19:33 · Kayla · repo session 63614cc0
+
+> these happen in the product? - MCP without a key returns HTTP 401, but the docs say 200. The test checks only the -32001 code.
+> - team=abc returns 403, but the docs say 422.
+> - The workspace has 0 screenings, so T18 covers screenings only at the response-shape and validation level.
+
+### 19:34 · Kayla · repo session 63614cc0
+
+> also I'm pretty sre that 36 was merged already. what api key do you need, to the product? it should be here: /Users/kaylamenashe/Downloads/Stonewake\ ITAC\ logins.pdf
+
+### 19:37 · Kayla · manager-tools session 6d3b62a6
+
+> for this, - bug-reporter: needs your Jam recordings and your approval before it files a bug in Spira., I should already have a local tool that does jam recordings. look in my workspace folder maybe?
+
+### 19:38 · Kayla · repo session 63614cc0
+
+> lets go ahead and open bugs for these in spiratest: - MCP without a key returns HTTP 401 with error -32001. If the docs really say 200, it's a docs mismatch; the call is still correctly rejected.
+> - /v1/deals?team=abc returns 403 forbidden, while an empty team= returns 422 validation_failed. So the API treats abc as a team we don't belong to, not as a malformed value. It's only a bug if the docs define a team-id format. here: [REDACTED]/33/Incident/Table.aspx
+
+### 19:38 · Lead → bug-reporter subagent (File 2 Stonewake API bugs in Spira) · repo session 63614cc0
+
+> You are the bug-reporter for the ITAC 2026 Finals, Stonewake. Kayla is the Lead and has approved filing these two bugs in SpiraTest, project 33 ([REDACTED]/33/Incident/Table.aspx).
+> 
+> Repo: /Users/kaylamenashe/workspace/stonewake-final-repo (master; PR #36 with the API tests is merged). Read CLAUDE.md, .claude/agents/bug-reporter.md, docs/BUGS.md, and docs/API_MAP.md (lines 35-45 hold the notes on both findings) before you start. Read .agents/inbox/bug-reporter.md if it exists. Work in your own worktree (git worktree add ../wt-bugs -b agent/bug-reporter) and only touch your owned paths.
+> - Node: prefix commands with PATH="$HOME/.nvm/versions/node/v26.13.0/bin:$PATH".
+> - gh: prefix commands with GH_TOKEN=$(gh auth token --user kaylamenashe8).
+> - Credentials: Finalist 4 only, from .env (STONEWAKE_API_KEY, SPIRA_*). Never print secrets, and never put the key in a bug body, curl example or attachment (write "Bearer <API_KEY>").
+> 
+> Lead verified these live at 19:3x today:
+> 1. MCP: a POST to https://mcp.stonewake.ai/ with tools/call company_profile and no Authorization header returns HTTP 401 with JSON-RPC error -32001 "No credential was sent...". The agent reported that the docs' MCP error table says HTTP 200 for this case.
+> 2. REST: GET /v1/deals?team=abc returns 403 `forbidden`. GET /v1/deals?team= (empty) returns 422 `validation_failed`. The agent reported that the docs say a malformed `team` gives 422.
+> 
+> Steps:
+> 1. Check each docs claim yourself at docs.stonewake.ai and quote the exact docs text and URL. Reproduce each case once with minimal requests (no write verbs).
+>    - If the docs do NOT say what was claimed (no 200 in the MCP error table; no 422 or team-id format for a malformed team), do not file that one. Report back to me why.
+> 2. Draft each bug in docs/BUGS.md:
+>    - Title: short and factual. Bug 1 is a docs/behaviour mismatch on the MCP auth error status code. Bug 2 is that a malformed team id is answered 403 instead of 422.
+>    - Steps to reproduce, expected (with the docs quote), actual (status code and error code), environment, and severity/priority. Use low/minor: the requests are still correctly rejected, so these are contract and docs mismatches.
+>    - Link the related tests: tests/api/mcp.entity.spec.ts and tests/api/deals.filters.spec.ts.
+>    - A Jam recording is optional for API-only bugs. Skip it if it costs time.
+> 3. File both through `npm run spira -- --submit` (scripts/spira-file.ts) into project 33. Run --draft first and check the payload. Record the SPIRA ids in docs/BUGS.md.
+> 4. Commit docs/BUGS.md on your branch, push it (no force), and open a PR. Run a self-review of the diff first.
+> 5. Update .agents/status/bug-reporter.json.
+> 
+> Report back in short TL;DR bullets: the SPIRA ids and links, which bugs (if any) you skipped and why, and the PR number.
+
+### 19:43 · Kayla · manager-tools session 948e0a84
+
+> let's remove the entire queue, and run the gate locally for now if posisble
+
+### 19:43 · Kayla · repo session 8e3183fb
+
+> run the 5 lanes: /Users/kaylamenashe/workspace/start-lanes.md
+
+### 19:44 · Kayla · repo session 63614cc0
+
+> open the .env file for me
+
+### 19:45 · Kayla · repo session 63614cc0
+
+> updated the .env try it now
+
+### 19:46 · Lead → running agent (Spira creds added, submit DRAFT-02) · repo session 63614cc0
+
+> From Kayla (Lead): the Spira vars (SPIRA_URL, SPIRA_USER, SPIRA_API_KEY, SPIRA_PROJECT_ID=33) are now in /Users/kaylamenashe/workspace/stonewake-final-repo/.env.
+> 
+> Don't copy, read or print .env. Copying it was blocked by a deny rule; don't work around that. Instead, run the submit with cwd = the main repo so its own env loader picks up .env, pointing at your worktree's BUGS.md:
+>   cd /Users/kaylamenashe/workspace/stonewake-final-repo && PATH="$HOME/.nvm/versions/node/v26.13.0/bin:$PATH" npm run spira -- --from-bugs /Users/kaylamenashe/workspace/wt-bug-reporter/docs/BUGS.md --id DRAFT-02 --draft
+> Check the payload, then run the same command with --submit.
+> 
+> If the script can't take an absolute --from-bugs path, or it writes the id back somewhere other than your worktree, stop and tell me. Don't edit files in the main repo checkout.
+> 
+> After you get the SPIRA id:
+> - make sure it's recorded in the worktree's docs/BUGS.md
+> - commit and push (no force) to PR #45
+> - update the status file
+> 
+> Reply with short TL;DR bullets: the SPIRA id, the link, and the PR state.
+
+### 19:46 · Lead → ci-infra subagent (ci-infra lane) · repo session 8e3183fb
+
+> You are the ci-infra lane. Your full brief is ~/workspace/stonewake-final-repo/.claude/agents/ci-infra.md; read it and the repo CLAUDE.md first, then follow its Mission, Owns, Done-when and Step protocol exactly.
+> Work only in your worktree ~/workspace/wt-ci-infra (branch agent/ci-infra); write only inside your owned paths.
+> Report status ONLY with the main repo as root, so the Control Center sees it:
+> `CLAUDE_PROJECT_DIR=$HOME/workspace/stonewake-final-repo node $HOME/workspace/stonewake-final-repo/.claude/hooks/status.mjs ci-infra <state> "<task>" [planItem] [pr] [note]`
+> Your inbox is ~/workspace/stonewake-final-repo/.agents/inbox/ci-infra.md; read it before every step, it overrides your plan.
+> You start late (lane window was 18:20-19:50); prioritise the smallest piece that meets your Done-when, and respect the cutoffs in your brief.
+> Never push to master or merge. Never install builds or wipe data without asking Kayla. Open a draft PR per your brief and report its link when you stop.
+
+### 19:46 · Lead → triage subagent (triage lane) · repo session 8e3183fb
+
+> You are the triage lane. Your full brief is ~/workspace/stonewake-final-repo/.claude/agents/triage.md; read it and the repo CLAUDE.md first, then follow its Mission, Owns, Done-when and Step protocol exactly.
+> Work only in your worktree ~/workspace/wt-triage (branch agent/triage); write only inside your owned paths.
+> Report status ONLY with the main repo as root, so the Control Center sees it:
+> `CLAUDE_PROJECT_DIR=$HOME/workspace/stonewake-final-repo node $HOME/workspace/stonewake-final-repo/.claude/hooks/status.mjs triage <state> "<task>" [planItem] [pr] [note]`
+> Your inbox is ~/workspace/stonewake-final-repo/.agents/inbox/triage.md; read it before every step, it overrides your plan.
+> You start late (lane window was 18:20-19:50); prioritise the smallest piece that meets your Done-when, and respect the cutoffs in your brief.
+> Never push to master or merge. Never install builds or wipe data without asking Kayla. Open a draft PR per your brief and report its link when you stop.
+
+### 19:46 · Lead → coverage subagent (coverage lane) · repo session 8e3183fb
+
+> You are the coverage lane. Your full brief is ~/workspace/stonewake-final-repo/.claude/agents/coverage.md; read it and the repo CLAUDE.md first, then follow its Mission, Owns, Done-when and Step protocol exactly.
+> Work only in your worktree ~/workspace/wt-coverage (branch agent/coverage); write only inside your owned paths.
+> Report status ONLY with the main repo as root, so the Control Center sees it:
+> `CLAUDE_PROJECT_DIR=$HOME/workspace/stonewake-final-repo node $HOME/workspace/stonewake-final-repo/.claude/hooks/status.mjs coverage <state> "<task>" [planItem] [pr] [note]`
+> Your inbox is ~/workspace/stonewake-final-repo/.agents/inbox/coverage.md; read it before every step, it overrides your plan.
+> You start late (lane window was 18:20-19:50); prioritise the smallest piece that meets your Done-when, and respect the cutoffs in your brief (coverage: no new test after 20:00).
+> Never push to master or merge. Never install builds or wipe data without asking Kayla. Open a draft PR per your brief and report its link when you stop.
+
+### 19:46 · Lead → bug-reporter subagent (bug-reporter lane) · repo session 8e3183fb
+
+> You are the bug-reporter lane. Your full brief is ~/workspace/stonewake-final-repo/.claude/agents/bug-reporter.md; read it and the repo CLAUDE.md first, then follow its Mission, Owns, Done-when and Step protocol exactly.
+> Work only in your worktree ~/workspace/wt-bug-reporter (branch agent/bug-reporter); write only inside your owned paths.
+> Report status ONLY with the main repo as root, so the Control Center sees it:
+> `CLAUDE_PROJECT_DIR=$HOME/workspace/stonewake-final-repo node $HOME/workspace/stonewake-final-repo/.claude/hooks/status.mjs bug-reporter <state> "<task>" [planItem] [pr] [note]`
+> Your inbox is ~/workspace/stonewake-final-repo/.agents/inbox/bug-reporter.md; read it before every step, it overrides your plan.
+> You start late (lane window was 18:20-19:50); prioritise the smallest piece that meets your Done-when, and respect the cutoffs in your brief.
+> Never push to master or merge. Never install builds or wipe data without asking Kayla. Open a draft PR per your brief and report its link when you stop.
+> 
+> Record the Jam yourself with the local `jam` CLI (already logged in to Kayla's personal workspace; run `jam skills get jam-cli` once for usage). This replaces step 1's "Kayla records it with Jam". Run the failing test once with video and trace on (`npx playwright test <spec> --project=chromium --retries=0 --trace=on --video=on`). Then build the Jam from its output in test-results/: write a jam.json with `"title": "<component>: <symptom>"`, `"description"` (steps, expected, actual), `"videoPath"` (the test's video.webm) and `"playwrightTracePath"` (its trace.zip). Check the payload shape with `jam agent-context`, then run `JAM_SKIP_UPDATE_CHECK=1 jam create jam @jam.json`. The trace fills the Jam's console, network and user actions. Check the result with `jam get console <jam> --level error` and `jam get network <jam> --status 4xx,5xx`, and put the Jam link in the BUGS.md draft.
+> Filing in Spira still needs Kayla's one-line approval: run `npm run spira -- --draft <bug id>`, set status `review`, and wait. Never `--submit` without her approval.
+> 
+> Note: your status file already shows pr 45 and a note that SPIRA_* credentials are missing from .env — an earlier run exists. Check PR #45 comments before resuming it.
+
+### 19:46 · Lead → scribe subagent (scribe lane) · repo session 8e3183fb
+
+> You are the scribe lane. Your full brief is ~/workspace/stonewake-final-repo/.claude/agents/scribe.md; read it and the repo CLAUDE.md first, then follow its Mission, Owns, Done-when and Step protocol exactly.
+> Work only in your worktree ~/workspace/wt-scribe (branch agent/scribe); write only inside your owned paths.
+> Report status ONLY with the main repo as root, so the Control Center sees it:
+> `CLAUDE_PROJECT_DIR=$HOME/workspace/stonewake-final-repo node $HOME/workspace/stonewake-final-repo/.claude/hooks/status.mjs scribe <state> "<task>" [planItem] [pr] [note]`
+> Your inbox is ~/workspace/stonewake-final-repo/.agents/inbox/scribe.md; read it before every step, it overrides your plan.
+> You start late (lane window was 18:20-19:50); prioritise the smallest piece that meets your Done-when, and respect the cutoffs in your brief (scribe: video script and TEST_PLAN by 20:10, all docs final by 20:40).
+> Never push to master or merge. Never install builds or wipe data without asking Kayla. Open a draft PR per your brief and report its link when you stop.
+
+### 19:47 · Kayla · repo session 8e3183fb
+
+> don't act as 20:00 is a hard stop. continue until at least 20:15 and then send a status and expected remaining time. From that I will decide which agents stop and which continue
+
+### 19:47 · Lead → running agent (ci-infra: cutoff override, report at 20:15) · repo session 8e3183fb
+
+> Kayla's override: you do not have to stop at 20:00. Keep working until at least 20:15. At 20:15, send main a status: what is done, what is left, and how much more time you expect to need. Kayla will then decide whether you stop or continue. Until she decides, keep working past 20:15. All other rules still apply: review and E2E before any push, draft PR only, no push to master.
+
+### 19:47 · Lead → running agent (triage: cutoff override, report at 20:15) · repo session 8e3183fb
+
+> Kayla's override: you do not have to stop at 20:00. Keep working until at least 20:15. At 20:15, send main a status: what is done, what is left, and how much more time you expect to need. Kayla will then decide whether you stop or continue. Until she decides, keep working past 20:15. All other rules still apply: review and E2E before any push, draft PR only, no push to master.
+
+### 19:47 · Lead → running agent (coverage: cutoff override, report at 20:15) · repo session 8e3183fb
+
+> Kayla's override: you do not have to stop at 20:00, and that includes the "no new test after 20:00" cutoff. Keep working until at least 20:15. At 20:15, send main a status: what is done, what is left, and how much more time you expect to need. Kayla will then decide whether you stop or continue. Until she decides, keep working past 20:15. All other rules still apply: a new test must still pass 10/10, review and E2E before any push, draft PR only, no push to master.
+
+### 19:47 · Lead → running agent (bug-reporter: cutoff override, report at 20:15) · repo session 8e3183fb
+
+> Kayla's override: you do not have to stop at 20:00. Keep working until at least 20:15. At 20:15, send main a status: what is done, what is left, and how much more time you expect to need. Kayla will then decide whether you stop or continue. Until she decides, keep working past 20:15. All other rules still apply: never run Spira --submit without her approval, draft PR only, no push to master.
+
+### 19:47 · Lead → running agent (scribe: cutoff override, report at 20:15) · repo session 8e3183fb
+
+> Kayla's override: the 20:00 and 20:10 cutoffs are not hard stops. Keep working until at least 20:15. At 20:15, send main a status: what is done, what is left, and how much more time you expect to need. Kayla will then decide whether you stop or continue. Until she decides, keep working past 20:15. Still get the video script and the TEST_PLAN export done as early as you can. All other rules still apply: draft PR only, no push to master.
+
+### 19:49 · Lead → running agent (SPIRA-89 filed; commit and push) · repo session 63614cc0
+
+> From Kayla (Lead): she filed it herself and it's SPIRA-89, [REDACTED]/33/Incident/89.aspx.
+> 
+> 1. Check that /Users/kaylamenashe/workspace/wt-bug-reporter/docs/BUGS.md now has SPIRA-89 in place of DRAFT-02. If it doesn't, add it.
+> 2. Add one CHANGELOG line about the filing.
+> 3. Self-review the diff, then commit and push to PR #45 (no force). Keep the PR as a draft.
+> 
+> Don't add knownBug to tests/api/mcp.entity.spec.ts. That test asserts only the -32001 code and passes, so skipping it would lose coverage. Note this in BUGS.md instead.
+> Don't attach a screenshot; it's an API-only bug.
+> 
+> Remove the .agents/status/bug-reporter.json you wrote in the main repo checkout if git shows it as untracked there. Your status lives in the worktree.
+> 
+> Set your status to review, then reply in 2-3 bullets.
+
+### 19:49 · Kayla · repo session 63614cc0
+
+> do this: - Lasting fix: add --env-file=.env to the spira script in package.json. That's the Architect's file, so it's your call as Lead.
+
+### 19:50 · Kayla · repo session 183b3583
+
+> are you still crawling?
+
+### 19:50 · Kayla · repo session 27d75d39
+
+> this is not updated: file:///private/tmp/claude-501/-Users-kaylamenashe-workspace-stonewake-final-repo/e2a9bded-076c-4e09-b309-c3ed89599981/scratchpad/test-plan.html
+
+### 19:51 · Kayla · repo session 63614cc0
+
+> explain the issue better
+
+### 19:52 · Kayla · repo session 183b3583
+
+> okay, so what is the status of the tests? have we added the tests that we want to? I want o go until at least 21:2
+
+### 19:52 · Kayla · repo session 183b3583
+
+> okay, so what is the status of the tests? have we added the tests that we want to? I want o go until at least 21:20
+
+### 19:52 · Lead → running agent (Resume, new 21:20 deadline, disk freed) · repo session 183b3583
+
+> Kayla has extended the run. The new stop is 21:20, replacing the 20:00 rule for this lane. The disk is fixed: 71 GB free.
+> 1. #42: rerun `npm run pre-pr` on `agent/crawler-t03` with the b9c4d36 fix. If it passes, push and update the PR body.
+> 2. Drop your T10 branch. Coverage's PR #48 already covers T10 (#7). Don't open a duplicate.
+> 3. When a PR slot frees (#41 or #42 merges), open T08, then T15. Before each one, switch it to the page objects in `src/pages/` (Countries/Portfolio/DealBook) instead of `tests/generated/pages/`, then redo the self-review and pre-pr.
+> 4. Then go on with the next tests: T04 sort (from your stash), T09, T11, T12, T14, T07, T23, T24, T25. Before you start any item, check that no other agent's PR already covers it.
+> 5. T05, T06 and T13 are still deferred until Kayla approves.
+> Same rules: self-review plus pre-pr before every PR, at most 2 PRs open, a gentle pace to avoid the 429, and no destructive or submit clicks. Clean up `test-results` between runs. Reply with TL;DR bullets.
+
+### 19:53 · Kayla · repo session 63614cc0
+
+> what exactly needs to be reverted here? - Revert 03aac6c, then push. I recommend this: the PR then says one consistent thing.
+
+### 19:55 · Kayla · repo session 63614cc0
+
+> yes, if we tested this and found a bug, we should have an automated test that runs it so that if/when there is a fix then we can run this to confirm: - The line doesn't skip the existing test. It suggests the API lane add a new test that checks for HTTP 200 and is marked knownBug('SPIRA-89'), so it's skipped until the bug is fixed. That's a valid pattern, not lost coverage.
+
+### 19:56 · Lead → running agent (Add knownBug SPIRA-89 MCP status test) · repo session 63614cc0
+
+> From Kayla (Lead), 19:55. Start now: the 20:00 cutoff is for starting new tests. New item: a test that checks for the documented behaviour of SPIRA-89, so we can confirm a fix once it ships.
+> 
+> - Start a fresh branch from origin/master (PR #36 is merged): agent/api-spira-89.
+> - In tests/api/mcp.entity.spec.ts, add one test: "should answer HTTP 200 with JSON-RPC -32001 when an MCP tool call sends no key". It asserts the HTTP status is 200 (the docs, https://docs.stonewake.ai/mcp Errors) and the error code is -32001.
+> - Put this as its first line: knownBug('SPIRA-89', 'MCP: tool call without credential answers HTTP 401, docs say HTTP 200 for -32001', '[REDACTED]/33/Incident/89.aspx'); Read how knownBug works in src/ first.
+> - Don't change the existing -32001 test.
+> - Make it one request, without a key, through ApiClient.
+> - Tag it @api @known-bug.
+> 
+> Then the full gate: 2+ self-review passes, tick .agents/review/<branch>.md, and run `npm run pre-pr` (10x at 1 and 4 workers, retries 0, smoke and the migrated suite). It must pass, with the known-bug test reported as skipped, not failed. Add a CHANGELOG line. Push without force and open a draft PR that says "Refs SPIRA-89". Update your status file.
+> 
+> If it can't be green by 20:20 (code freeze), stop and tell me. Reply in TL;DR bullets.
+
+### 19:56 · Lead → running agent (Keep 03aac6c, fix wording, push #45) · repo session 63614cc0
+
+> From Kayla (Lead): keep 03aac6c, do not revert it. Decision: a skipped knownBug('SPIRA-89') test that checks for HTTP 200 should exist, so a fix can be confirmed. The api agent is adding it now in its own PR.
+> 
+> In your worktree:
+> 1. In docs/CHANGELOG.md and docs/BUGS.md, replace "no knownBug skip" / "no knownBug" with: the existing -32001 test stays as it is, and a new knownBug('SPIRA-89') test checking for HTTP 200 is added by the api lane.
+> 2. Fix the wording "Kayla filed it in the Spira UI". She ran `spira-file.ts --submit` from the command line.
+> 3. Make sure the CHANGELOG has a single, consistent SPIRA-89 filing story. Merge duplicate lines if needed.
+> 4. Self-review, run `npm run pre-pr`, then push without force to PR #45. Keep it a draft and set your status to review.
+> 
+> Reply in 2-3 bullets.
+
+### 19:57 · Lead → running agent (Start T04 while T08 owner is decided) · repo session 183b3583
+
+> I've updated the PR #42 body.
+> Note for gh: Kayla's setup is to run gh with GH_TOKEN=$(gh auth token --user kaylamenashe8). That's the approved account, not a workaround. Use it from now on.
+> - Kayla is still deciding who owns T08. Keep your branch and don't open a PR for it yet.
+> - Keep `agent/crawler-t15` for now and don't delete it.
+> - Start T04 now from your stash. Rebase it onto master's `src/pages/DealBookPage`, run the self-review and pre-pr, and keep it on its own branch until a PR slot frees.
+> - After T04, go on to T09, T11, T12, T14, T07, T23, T24, T25. Stop at 21:20. Reply with TL;DR bullets.
+
+### 19:58 · Kayla · repo session fd1bc6fd
+
+> why did the ci on master fail? #46 is still a draft, is it really ready for review? so the scribe should handle it, or give me the command to run. drop the commit
+
+### 20:03 · Kayla · repo session 8e3183fb
+
+> 1. Do I symlink .env into wt-scribe, the same way the other lanes did? - yes. 2 yes. 3. triage continue, open the test plan (it got closed) so I can review the tests 4. yes
+
+### 20:04 · Lead → running agent (scribe: .env present, open draft PR) · repo session 8e3183fb
+
+> Kayla approved the .env symlink, and ~/workspace/wt-scribe/.env now exists. Do not read its contents. Next: re-run `npm run pre-pr` on HEAD, then open the draft PR with `env -u GITHUB_TOKEN -u GH_TOKEN gh pr create --draft --base master --head agent/scribe` and paste the Self-review and E2E blocks into it. After that, continue with the rest of your list: the final gate fills from 20:20 and the TEST_PLAN/STP row updates. New PRs to track: #46 ci-infra, #47 triage, #48 T10, #49 T15, #52 T08, #45 bug-reporter (SPIRA-89, which also goes in the README's "Known product bugs"). Report back when you stop.
+
+### 20:04 · Lead → running agent (triage: continue, verify on PR) · repo session 8e3183fb
+
+> Kayla says triage continues. Next steps:
+> (1) Your finding 2, the triage job being skipped on PR runs, needs a fix in .github/workflows/ci.yml, which is not your path. Write the exact change (guard and reason) into ~/workspace/stonewake-final-repo/.agents/inbox/ci-infra.md as a request.
+> (2) Once ci-infra's PR #46 merges (it adds STONEWAKE_API_KEY), rebase #47 and confirm its CI goes green.
+> (3) Once the guard fix lands, confirm triage actually runs on one PR.
+> Never push to master. Report back with status and expected remaining time when you stop.
+
+### 20:04 · Lead → running agent (bug-reporter: you push #45, add skip) · repo session 8e3183fb
+
+> Kayla's decisions:
+> (a) You are the session that pushes PR #45.
+> (b) Yes, she wants the skipped test.
+> Steps:
+> 1. Make sure no other session is still running in wt-bug-reporter (check `ps` for playwright/node processes with that cwd). If one is, set status to blocked and report back; do not proceed.
+> 2. Drop the local commit 03aac6c with `git revert` (Kayla approved dropping it; revert keeps the history safe), or rewrite the CHANGELOG line so it is correct. It must say: Kayla filed SPIRA-89 in the Spira UI, and a skipped test is added.
+> 3. Add the skipped test that pins HTTP 200 with `knownBug('SPIRA-89', 'MCP: tool call without credential answers HTTP 401, docs say HTTP 200 for -32001', '[REDACTED]/33/Incident/89.aspx')`. Do this only if the spec file is in your owned paths. If it is not, write the exact test into ~/workspace/stonewake-final-repo/.agents/inbox/api.md as a request and say so.
+> 4. Rebase on master, run one clean `npm run pre-pr`, push, and update PR #45. Leave it as a draft, and paste the Self-review and E2E blocks.
+> Never run `--submit`. Report back when you stop.
+
+### 20:05 · Kayla · repo session 183b3583
+
+> yes, crawler keeps it
+
+### 20:05 · Lead → running agent (T08 is yours) · repo session 183b3583
+
+> Kayla decided T08 (#6) is yours. Coverage has been told not to push its T08.
+> - Keep T08 queued. When #41 or #42 merges, open its PR first, ahead of T04. Before that, redo the self-review and pre-pr against the latest master.
+> - `NetworkPage` and `CompanyPage` can stay in `tests/generated/pages/`, since `src/pages/` has no versions of them. Add a REQUEST in the CHANGELOG to promote them.
+> - Keep working on T04 in the meantime.
+
+### 20:06 · Kayla · manager-tools session 948e0a84
+
+> so I can review and merge? they have been reviewed and tested by the agent already?
+
+### 20:06 · Kayla · manager-tools session 948e0a84
+
+> so they aren't actually drafts, they are ready to merge after i review them
+
+### 20:11 · Kayla · repo session 8e3183fb
+
+> is anything still waiting for review?
+
+### 20:12 · Kayla · repo session 63614cc0
+
+> what is t19 tst?
+
+### 20:13 · Kayla · repo session 27d75d39
+
+> open it for me again?
+
+### 20:13 · Kayla · repo session 27d75d39
+
+> ❯ this is with old stats
+
+### 20:13 · Kayla · repo session 8e3183fb
+
+> anything now?
+
+### 20:14 · Kayla · repo session 63614cc0
+
+> I want ot add T19
+
+### 20:16 · Kayla · repo session 8e3183fb
+
+> done, saved
+
+### 20:17 · Lead → running agent (scribe: Pages live, add report link) · repo session 8e3183fb
+
+> GitHub Pages is now live: https://kaylamenashe8.github.io/stonewake-final-repo/ (the latest report is at /latest/; both return 200). #46, #47, #51 and #52 are merged. Next:
+> 1. Merge origin/master into agent/scribe so #53's CI picks up the STONEWAKE_API_KEY fix.
+> 2. Add the Pages report/history links to the README, and update the TEST_PLAN/STP rows for the merged PRs.
+> 3. Re-run pre-pr and push to #53. Leave the gate numbers "Pending" until I send you the run ID.
+> Report back when you stop.
+
+### 20:17 · Kayla · repo session fd1bc6fd
+
+> what is this: Needs Kayla: gh pr ready 46; enable Pages (gh-pages root); dispatch stability-gate (parallel+sequential)
+> and T10 PR #48 and T15 PR #49 ready for review; T08 needs Kayla to allow push of agent/coverage-t08
+
+### 20:17 · Kayla · repo session 63614cc0
+
+> do it
+
+### 20:18 · Lead → running agent (T19 approved: Lead override past cutoff) · repo session 63614cc0
+
+> From Kayla (Lead), 20:15: she explicitly approved adding T19 (#13) now, overriding the 20:00 cutoff and the 20:20 freeze for this item only. Write requests to the live API are approved for this test only.
+> 
+> T19 checks that the viewer key is read-only: write verbs are refused with the 403 envelope (REQ-API-04).
+> - New branch from origin/master: agent/api-t19.
+> - Find the write routes in the docs/OpenAPI (https://api.stonewake.ai/openapi.json). Pick 2-4 representative POST/PUT/PATCH/DELETE routes.
+> - Safety:
+>   - Bodies are DataFactory/RUN_ID-prefixed test data only, never real records.
+>   - DELETE/PUT/PATCH only on ids your own test would own. If you have none, use a resource id that is clearly yours, or a documented way to reach the role check without touching real data. Don't run a write against a real existing record, even if you expect a 403.
+>   - Assert status 403 and the error envelope (zod), and that no data comes back.
+>   - Use few requests and respect the rate limit.
+> - If a write is ever accepted (2xx), stop at once and don't retry. Record exactly what was created or changed, try to clean up only what your test created, and tell me. That would be a security bug for docs/BUGS.md.
+> - Name the file feature.action.spec.ts and tag it @api @regression. Titles follow "should … when …".
+> - Full gate: 2+ self-review passes, the .agents/review checklist, and `npm run pre-pr` (10x at 1 and 4 workers, retries 0). If a test can't reach 10/10, don't add it; label #13 not-added.
+> - Add a CHANGELOG line noting the Lead override (time and reason) and the API_MAP update. Push without force, open a draft PR with "Closes #13", and set your status.
+> 
+> Reply in TL;DR bullets as soon as it's done or blocked.
+
+### 20:18 · Kayla · repo session 27d75d39
+
+> can I review 53 or it's waiting for something?
+
+### 20:19 · Kayla · repo session 63614cc0
+
+> give me a status check
+
+### 20:20 · Kayla · repo session fd1bc6fd
+
+> I am finishing with test T-19. I want to ensure that I am using the docker like was planned. I also want to incude my PRD document so that the plan is shown in the final product. After T-19 is complete, I want to implement the code freeze. What are the steps afterwards?
+
+### 20:22 · Kayla · repo session 63614cc0
+
+> The gate passed, but the tests expect 405, not the 403 in the plan. -- check the product spec, if it's supposed to be 403 in the spec when we should open a bug in spiratest
+
+### 20:23 · Kayla · repo session 63614cc0
+
+> sure, or jsut change the expected result
+
+### 20:23 · Kayla · repo session 63614cc0
+
+> how much longer
+
+### 20:24 · Kayla · repo session fd1bc6fd
+
+> T19 is merged.
+
+### 20:26 · Kayla · repo session fd1bc6fd
+
+> 1. this is the PRD/Tech Spec: e pRD: https://claude.ai/artifact/Ue1Rgzkw4dGPu88ukTQY7F?sk=Z86_g1l92LhNn3y7KZys
+
+### 20:26 · Kayla · repo session f994c96c
+
+> does 53 need to be in master to get the numbers? or in draft?
 
