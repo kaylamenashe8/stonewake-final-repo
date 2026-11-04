@@ -1,6 +1,6 @@
 import { test, expect } from '../../../src/fixtures';
-import { FAKE_LIVE_KEY, UNAUTHENTICATED, apiKey } from './helpers';
-import { ErrorEnvelopeSchema, HealthSchema, MeSchema } from './schemas';
+import { FAKE_LIVE_KEY, UNAUTHENTICATED, apiKey } from './test-data-and-api-key';
+import { ErrorEnvelopeSchema, HealthSchema, MeSchema } from './response-schemas';
 
 // Migrated from tests/api.spec.ts (api 1-4). Read-only calls; api 2 uses our viewer key.
 
