@@ -37,6 +37,7 @@
 | J11 | Is API testing expected in the final; is there API documentation or a Swagger page? | | |
 | J12 | (Luca, 18:18, WhatsApp) Is security testing allowed? | Yes: "feel free to do everything you want". | D17 |
 | J13 | (Luca, 19:02, WhatsApp) Product update: social monitoring | Monitoring now has two tabs, **Research** and **Sentiment**. "Monitor a name" (top right) adds a company, person, brand or topic; Sentiment shows what public posts say per name; each row can be paused or removed in place; posts for a new name appear after its next reading; refresh once to see it. | D18 |
+| J14 | (Organizers, 19:22) Deliverable: a Markdown file in the repo with the prompts used during the competition | `docs/PROMPTS.md`: key prompts + full log, exported from the session transcripts by `scripts/export-prompts.mjs` (secrets redacted); regenerate before submitting. | |
 
 ## Decisions made on the day
 | Time | Decision | Why | By |
