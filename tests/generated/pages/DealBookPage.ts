@@ -70,6 +70,18 @@ export class DealBookPage extends BasePage {
     return first;
   }
 
+  /** Name and sector of the first listed deal, then opens it (client-side route to /deals/:id). */
+  async openFirstDeal(): Promise<{ name: string; sector: string }> {
+    // first(): the test takes whichever deal ranks first today instead of a hardcoded id.
+    const link = (await this.dealRows()).first().getByRole('link');
+    const lines = (await link.innerText()).trim().split('\n');
+    const name = lines.at(-2)?.trim() ?? '';
+    const sector = lines.at(-1)?.split(' · ').at(-1)?.trim() ?? '';
+    if (!name || !sector) throw new Error(`Deal Book: cannot read name and sector from "${lines.join(' | ')}"`);
+    await link.click();
+    return { name, sector };
+  }
+
   private async dealsTotal(action: () => Promise<void>, urlPart = ''): Promise<number> {
     const response = this.page.waitForResponse(
       (r: Response) => r.request().method() === 'POST' && DEALS_LIST.test(r.url()) && r.url().includes(urlPart),
