@@ -21,7 +21,7 @@
     "triage:claude": "tsx triage/claude-diagnose.ts",
     "crawl": "tsx crawler/crawl.ts",
     "promote": "tsx crawler/promote.ts",
-    "spira": "tsx scripts/spira-file.ts",
+    "spira": "tsx --env-file-if-exists=.env scripts/spira-file.ts",
     "plan:issues": "tsx scripts/plan-to-issues.ts",
     "gate:summary": "tsx scripts/gate-summary.ts",
     "control-center": "node control-center/server.mjs"
