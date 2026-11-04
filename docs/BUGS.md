@@ -42,7 +42,7 @@
 - Repro run: chromium, Playwright 1.64.1, retries 0, trace + video on, 2026-11-04 17:47 UTC, commit 7edc10b. Expected 200, received 401.
 - Evidence notes: the Jam holds the video and Playwright trace; its network tab shows `POST 401 https://mcp.stonewake.ai/`. Its one console error is a CSP notice from the docs page and is unrelated.
 - Linked test: tests/api/mcp.entity.spec.ts
-- Known-bug handling: the existing -32001 test in tests/api/mcp.entity.spec.ts stays as it is (it asserts only the JSON-RPC code and passes), and a new knownBug('SPIRA-89') test checking for HTTP 200 is added by the api lane, so a fix can be confirmed. API-only bug, no screenshot attached in Spira.
+- Known-bug handling: the existing -32001 test in tests/api/mcp.entity.spec.ts stays as it is (it asserts only the JSON-RPC code and passes), and a new skipped knownBug('SPIRA-89', ...) test checking for HTTP 200 is added by the api lane (requested 20:07), so a fix can be confirmed. API-only bug, no screenshot attached in Spira.
 - Spira: [SPIRA-89](https://itac.spiraservice.net/33/Incident/89.aspx)
 
 ## Reviewed, not filed
