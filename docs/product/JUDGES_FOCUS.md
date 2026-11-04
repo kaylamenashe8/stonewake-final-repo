@@ -17,7 +17,29 @@ These six are a starting point, not a limit. The rest of the product is in scope
 2. **Updated STP**: the software test plan (kit: `docs/STP.md`), updated to Stonewake and the six flows.
 3. **Bug report**: every product bug found, with steps, expected, actual and evidence (kit: `docs/BUGS.md`, filed with `npm run spira`).
 
-A transcript with further instructions is coming; add its rules here.
+## Rules from the opening briefing (Zoom, 17:43-17:57)
+
+- **Scenario:** you joined a new company. A developer with no testing background wrote this automation; it sort of works and is flaky. Make it a real, stable project. "Lots of things don't work well": find them yourself.
+- **Stack is fixed:** TypeScript only, Playwright, GitHub, GitHub Actions allowed. Same for everyone, for fairness.
+- **AI is fully open** (any tool or model). **Very important for scoring:** show how you worked with the AI: every model used and every prompt. Ask the AI to summarise the session if needed. -> `docs/AI_LOG.md` + the prompt logger hook.
+- **Deliverables:** the code with green runs; a **bug report**; an updated STP; a **video** that shows the run executing (can be recorded; a short walkthrough is fine).
+- **A test that stays red because of a product bug is acceptable:** keep it (skipped/annotated) and state why it remains.
+- **Repo:** fork the given repo to your own account; no PRs to the original. Work in your repo and submit its link through the form.
+- **Judging** happens remotely tomorrow; judges include Omri Maman, Igor, Sefi, Yoni, Nachum Dimer, Yair, Jack.
+- **Product questions:** Luca (Stonewake) answers in the WhatsApp group during the competition.
+
+## Product notes from Luca's walkthrough
+
+- Three pillars: deal sourcing (Deal Book, Tenders), counterparty intelligence (Network, Screenings), portfolio monitoring.
+- **Teams:** Real Estate, Export Finance, Project Finance. The Deal Book changes with the team you pick (Project Finance does not see real-estate deals).
+- **Deal Book:** deals found in public sources; open one for its brief, its source and "view at source"; each deal has a score, and **Scoring** settings change which deals appear and how they rank.
+- **Tenders:** like the Deal Book but official government data; can be added to the Deal Book.
+- **Countries:** compiled country risk score. **Institutions:** exposure to institutions (less important).
+- **Network:** who owns and runs a company, ownership chain, subsidiaries.
+- **Monitoring:** monitor a deal or a company and get periodic updates.
+- **Portfolio:** upload a book or add a company (searched from the Network); it computes credit-monitoring scores and shows financing, register records, officers and ownership.
+- Data is sometimes incomplete (restricted or paid datasets), so some companies show more than others; every value links to its source. Do not treat "less data" alone as a bug.
+- **Screening:** a person or a company; enter the name and details, start the screening, read adverse media (corruption, bribery, sanctions, fraud...).
 
 ## Environment rules
 
