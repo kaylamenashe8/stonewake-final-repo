@@ -1,11 +1,12 @@
-import { test, expect } from '../../src/fixtures';
-import { requirement } from '../../src/utils/annotations';
-import { DealBookPage } from './pages/DealBookPage';
-import { savedFile } from './pages/downloads';
+import { test, expect } from '../../../src/fixtures';
+import { aiGenerated, requirement } from '../../../src/utils/annotations';
+import { DealBookPage } from '../../generated/pages/DealBookPage';
+import { savedFile } from '../../generated/pages/downloads';
 
 test.describe('Deal Book Excel export @regression', () => {
   test('should download an Excel workbook when Export is clicked on the Deal Book', async ({ page }) => {
     requirement('T03');
+    aiGenerated('b9c303a');
     const dealBook = new DealBookPage(page);
     await dealBook.open();
 
