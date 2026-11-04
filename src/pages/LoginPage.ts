@@ -1,54 +1,97 @@
-import { expect } from '@playwright/test';
+import { expect, type Locator } from '@playwright/test';
 import { BasePage } from './BasePage';
 import { by, element } from './spec';
 
 /**
- * Template login page: generic role/label locators that fit most products.
- * The Architect/Stabilizer adapts primaries to the real DOM on the day; alternates stay as heal fallbacks.
+ * Sign-in route. Not configurable yet: LOGIN_PATH is not in the env schema (src/config/env.ts), requested
+ * from the Architect in docs/CHANGELOG.md.
+ */
+const LOGIN_PATH = '/login';
+
+/**
+ * Stonewake sign-in form (/login): Email, Password, a custom "I agree to the Evaluation Terms" checkbox
+ * (button[role=checkbox]) that gates the "Sign in" button, and an "Email me a link" button that must never
+ * match the Sign in locator (F10). Primaries are role/label; alternates stay as heal fallbacks.
  */
 export class LoginPage extends BasePage {
-  protected readonly path = process.env.LOGIN_PATH ?? '/';
+  protected override readonly path = LOGIN_PATH;
+
+  readonly signInHeading = element('Login > Heading', by.role('heading', 'Sign in'), by.css('main h1'));
 
   readonly username = element(
-    'Login > Username',
-    by.label(/user ?name|e-?mail/i),
-    by.role('textbox', /user ?name|e-?mail/i),
-    by.testId('username'),
-    by.css('input[name="username"], input[type="email"], #user-name'),
+    'Login > Email',
+    by.label('Email'),
+    by.role('textbox', 'Email'),
+    by.css('input[type="email"]'),
   );
 
-  readonly password = element(
-    'Login > Password',
-    by.label(/password/i),
-    by.testId('password'),
-    by.css('input[type="password"]'),
+  readonly password = element('Login > Password', by.label('Password'), by.css('input[type="password"]'));
+
+  readonly terms = element(
+    'Login > Terms checkbox',
+    by.role('checkbox', /agree to the .*terms/i),
+    by.css('button[role="checkbox"]'),
   );
 
   readonly submit = element(
-    'Login > Submit',
+    'Login > Sign in',
     by.role('button', /^(log ?in|sign ?in)$/i),
-    by.testId('login-button'),
-    by.css('[type="submit"]'),
+    by.css('button[type="submit"]'),
   );
 
-  readonly error = element('Login > Error', by.role('alert', /.+/), by.testId('error'), by.css('[class*="error"]'));
+  readonly termsOfService = element(
+    'Login > Terms of Service link',
+    by.role('link', 'Terms of Service'),
+    by.css('a[href$="/terms"]'),
+  );
 
-  async login(user: string, pass: string): Promise<void> {
-    await (await this.el(this.username)).fill(user);
-    await (await this.el(this.password)).fill(pass);
-    // Stonewake: "Sign in" stays disabled until the terms checkbox is ticked.
-    const terms = this.page.getByRole('checkbox', { name: /agree to the .*terms/i });
-    if ((await terms.count()) > 0) await terms.check();
-    await (await this.el(this.submit)).click();
+  // The message is a plain <p> (no role=alert; the page's only alert is the empty route announcer), so text
+  // is the strongest locator available.
+  readonly error = element('Login > Error', by.text(/do not match/i), by.text(/check both and try again/i));
+
+  override async waitUntilReady(): Promise<void> {
+    await expect(await this.heading()).toBeVisible();
   }
 
-  async errorText(): Promise<string> {
-    return (await this.el(this.error)).innerText();
+  heading(): Promise<Locator> {
+    return this.el(this.signInHeading);
+  }
+
+  submitButton(): Promise<Locator> {
+    return this.el(this.submit);
+  }
+
+  termsCheckbox(): Promise<Locator> {
+    return this.el(this.terms);
+  }
+
+  termsOfServiceLink(): Promise<Locator> {
+    return this.el(this.termsOfService);
+  }
+
+  errorMessage(): Promise<Locator> {
+    return this.el(this.error);
+  }
+
+  async fillCredentials(user: string, pass: string): Promise<void> {
+    await (await this.el(this.username)).fill(user);
+    await (await this.el(this.password)).fill(pass);
+  }
+
+  /** Idempotent: the tick is remembered in localStorage (exfin.terms-tick), so check() rather than click(). */
+  async acceptTerms(): Promise<void> {
+    await (await this.el(this.terms)).check();
+  }
+
+  async login(user: string, pass: string): Promise<void> {
+    await this.fillCredentials(user, pass);
+    await this.acceptTerms();
+    await (await this.el(this.submit)).click();
   }
 
   /** Used by auth.setup only; feature tests assert on their own landing page. */
   async expectLoggedIn(): Promise<void> {
-    await expect(this.page).not.toHaveURL(/login|signin|sign-in/i);
-    await expect(this.page.getByLabel(/password/i)).toBeHidden();
+    await expect(this.page).not.toHaveURL(/\/login/);
+    await expect(this.page.getByLabel('Password', { exact: true })).toBeHidden();
   }
 }

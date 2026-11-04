@@ -34,6 +34,10 @@ Claude Code (Lead session + subagents in `.claude/agents/`), Playwright MCP, Pla
 
 ## Prompt log (auto-appended)
 
+The complete, time-ordered log of every prompt across all sessions (including subagent delegations and the sessions
+this hook did not see) is `docs/PROMPTS.md`, regenerated with `node scripts/export-prompts.mjs`.
+
+
 ### 2026-11-04T16:01:51.011Z
 I am now in the competition, get caught up with everything that was done. I accidentally stopped some processes, I need to understand what was interuppted so that i can give you want you need
 

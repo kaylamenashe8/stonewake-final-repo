@@ -8,15 +8,16 @@ type AriaRole = Parameters<Page['getByRole']>[0];
  * getByRole+name > getByLabel > getByTestId > getByText > scoped CSS.
  */
 export const by = {
+  /** A string name is matched exactly; use a RegExp for partial matches. */
   role: (role: AriaRole, name: string | RegExp): Alternate => ({
     strategy: 'role',
     describe: `getByRole('${role}', { name: ${String(name)} })`,
-    build: (p) => p.getByRole(role, { name }),
+    build: (p) => p.getByRole(role, { name, exact: typeof name === 'string' }),
   }),
   label: (label: string | RegExp): Alternate => ({
     strategy: 'label',
     describe: `getByLabel(${String(label)})`,
-    build: (p) => p.getByLabel(label),
+    build: (p) => p.getByLabel(label, { exact: typeof label === 'string' }),
   }),
   testId: (id: string): Alternate => ({
     strategy: 'testid',
@@ -37,7 +38,8 @@ export const by = {
 
 /** element('Login > Submit', by.role('button', 'Login'), by.testId('login-button')) */
 export function element(name: string, primary: Alternate, ...alternates: Alternate[]): ElementSpec {
-  const role = primary.strategy === 'role' ? /getByRole\('([^']+)', \{ name: (.+) \}\)/.exec(primary.describe) : null;
+  const role =
+    primary.strategy === 'role' ? /getByRole\('([^']+)', \{ name: (.+) \}\)/.exec(primary.describe) : null;
   return {
     element: name,
     primary: primary.build,
