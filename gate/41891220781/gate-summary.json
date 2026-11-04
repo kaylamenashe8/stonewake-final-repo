@@ -1,0 +1,103 @@
+{
+  "green": true,
+  "greenRuns": 5,
+  "totalRuns": 5,
+  "verdict": "GATE: 5/5 GREEN",
+  "rows": [
+    {
+      "run": 1,
+      "missing": false,
+      "passed": 87,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 2,
+      "healed": 0,
+      "durationMs": 39089.967041015625,
+      "failures": [],
+      "flakyTests": [],
+      "skippedWithBug": [
+        {
+          "test": "api/mcp.entity.spec.ts > MCP entity parity @api > should answer HTTP 200 with JSON-RPC -32001 when an MCP tool call sends no key",
+          "bug": "SPIRA-89 https://itac.spiraservice.net/33/Incident/89.aspx"
+        }
+      ],
+      "green": true
+    },
+    {
+      "run": 2,
+      "missing": false,
+      "passed": 87,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 2,
+      "healed": 0,
+      "durationMs": 35061.196044921875,
+      "failures": [],
+      "flakyTests": [],
+      "skippedWithBug": [
+        {
+          "test": "api/mcp.entity.spec.ts > MCP entity parity @api > should answer HTTP 200 with JSON-RPC -32001 when an MCP tool call sends no key",
+          "bug": "SPIRA-89 https://itac.spiraservice.net/33/Incident/89.aspx"
+        }
+      ],
+      "green": true
+    },
+    {
+      "run": 3,
+      "missing": false,
+      "passed": 87,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 2,
+      "healed": 0,
+      "durationMs": 42228.1201171875,
+      "failures": [],
+      "flakyTests": [],
+      "skippedWithBug": [
+        {
+          "test": "api/mcp.entity.spec.ts > MCP entity parity @api > should answer HTTP 200 with JSON-RPC -32001 when an MCP tool call sends no key",
+          "bug": "SPIRA-89 https://itac.spiraservice.net/33/Incident/89.aspx"
+        }
+      ],
+      "green": true
+    },
+    {
+      "run": 4,
+      "missing": false,
+      "passed": 87,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 2,
+      "healed": 0,
+      "durationMs": 40230.945068359375,
+      "failures": [],
+      "flakyTests": [],
+      "skippedWithBug": [
+        {
+          "test": "api/mcp.entity.spec.ts > MCP entity parity @api > should answer HTTP 200 with JSON-RPC -32001 when an MCP tool call sends no key",
+          "bug": "SPIRA-89 https://itac.spiraservice.net/33/Incident/89.aspx"
+        }
+      ],
+      "green": true
+    },
+    {
+      "run": 5,
+      "missing": false,
+      "passed": 87,
+      "failed": 0,
+      "flaky": 0,
+      "skipped": 2,
+      "healed": 0,
+      "durationMs": 35844.824951171875,
+      "failures": [],
+      "flakyTests": [],
+      "skippedWithBug": [
+        {
+          "test": "api/mcp.entity.spec.ts > MCP entity parity @api > should answer HTTP 200 with JSON-RPC -32001 when an MCP tool call sends no key",
+          "bug": "SPIRA-89 https://itac.spiraservice.net/33/Incident/89.aspx"
+        }
+      ],
+      "green": true
+    }
+  ]
+}
