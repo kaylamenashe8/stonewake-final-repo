@@ -16,6 +16,7 @@
 | D10 | Bug tracking = SpiraTest (required). Notifications = Slack Incoming Webhook. No personal Jira. | Spira is mandatory; a webhook is one secret with the fewest failure points. |
 | D11 | Every CI job runs in the pinned Playwright Docker image; visual baselines are generated in the same image. | Same environment locally and in CI; macOS screenshots never match Linux. |
 | D12 | The kit is built in advance and disclosed in the README as prepared before the competition. | Transparency; preparation is not an unfair advantage. |
+| D14 | Keep the given default branch `master`; the kit's workflows, scripts and agents point at `master`. | Kayla's preference; no surprise for the judges comparing with the original repo. |
 | D13 | Every agent works in its own git worktree and branch and owns specific directories; merge order is fixed. | Parallel agents on one tree create conflicts and lost work. |
 
 ## Judge answers (17:50-18:00 — write answers here immediately)
