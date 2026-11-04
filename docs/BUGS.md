@@ -4,7 +4,7 @@
 
 | Spira ID | Title | Severity | Found by | Jam | Linked test | Status |
 |---|---|---|---|---|---|---|
-| SPIRA-PENDING | MCP: tool call without credential answers HTTP 401, docs say HTTP 200 for -32001 | low | exploratory (API lane) | n/a (API only) | tests/api/mcp.entity.spec.ts | draft |
+| DRAFT-02 | MCP: tool call without credential answers HTTP 401, docs say HTTP 200 for -32001 | low | exploratory (API lane) | n/a (API only) | tests/api/mcp.entity.spec.ts | draft |
 
 ## Drafts
 
