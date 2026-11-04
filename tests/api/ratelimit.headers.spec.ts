@@ -14,7 +14,9 @@ test.describe('API rate-limit headers @api', () => {
     expect(res.headers.ratelimit).toMatch(/"key-minute";r=\d+;t=\d+/);
     expect(res.headers['x-ratelimit-limit']).toMatch(/^\d+$/);
     expect(res.headers['x-ratelimit-remaining']).toMatch(/^\d+$/);
-    expect(Number(res.headers['x-ratelimit-remaining'])).toBeLessThanOrEqual(Number(res.headers['x-ratelimit-limit']));
+    expect(Number(res.headers['x-ratelimit-remaining'])).toBeLessThanOrEqual(
+      Number(res.headers['x-ratelimit-limit']),
+    );
     expect(res.headers['x-ratelimit-reset']).toMatch(/^\d+$/);
   });
 

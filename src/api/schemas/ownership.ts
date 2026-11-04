@@ -5,7 +5,13 @@ export const OwnershipChainSchema = z
   .object({
     root_id: z.number().int(),
     computed_at: z.iso.datetime({ offset: true }),
-    params: z.object({ threshold: z.number().gt(0).max(100), max_depth: z.number().int().min(1).max(8), include_persons: z.boolean() }).loose(),
+    params: z
+      .object({
+        threshold: z.number().gt(0).max(100),
+        max_depth: z.number().int().min(1).max(8),
+        include_persons: z.boolean(),
+      })
+      .loose(),
     nodes: z.array(z.object({ node_id: z.number().int(), label: z.string() }).loose()),
     paths: z.array(
       z

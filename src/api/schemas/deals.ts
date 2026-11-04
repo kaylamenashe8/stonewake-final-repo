@@ -10,7 +10,10 @@ export const DealRowSchema = z.object({
   team_name: z.string().nullable(),
   name: z.string().min(1),
   summary: z.string().nullable(),
-  primary_country_iso3: z.string().regex(/^[A-Z]{3}$/).nullable(),
+  primary_country_iso3: z
+    .string()
+    .regex(/^[A-Z]{3}$/)
+    .nullable(),
   countries: z.array(z.string()),
   countries_iso3: z.array(z.string().nullable()),
   sector: z.string().nullable(),

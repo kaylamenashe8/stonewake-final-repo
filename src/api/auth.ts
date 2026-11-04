@@ -6,6 +6,7 @@ import { env } from '../config/env';
  */
 export function apiKey(): string {
   const key = env.STONEWAKE_API_KEY;
-  if (!key) throw new Error('STONEWAKE_API_KEY is not set (see .env.example); API tests need the Finalist 4 key.');
+  if (!key)
+    throw new Error('STONEWAKE_API_KEY is not set (see .env.example); API tests need the Finalist 4 key.');
   return key;
 }

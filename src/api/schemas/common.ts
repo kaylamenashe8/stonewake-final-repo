@@ -27,4 +27,6 @@ export const listEnvelope = <T extends z.ZodType>(item: T) =>
   });
 
 export const NOT_FOUND = { error: { code: 'not_found', message: 'Resource not found.' } } as const;
-export const UNAUTHENTICATED = { error: { code: 'unauthenticated', message: 'Missing or invalid credentials.' } } as const;
+export const UNAUTHENTICATED = {
+  error: { code: 'unauthenticated', message: 'Missing or invalid credentials.' },
+} as const;

@@ -11,7 +11,8 @@ export function orderViolations(values: readonly (number | null)[], direction: D
     const a = values[i] ?? null;
     const b = values[i + 1] ?? null;
     if (a === null && b !== null) out.push(`#${i} null before #${i + 1}=${b}`);
-    else if (a !== null && b !== null && (direction === 'asc' ? a > b : a < b)) out.push(`#${i}=${a} then #${i + 1}=${b}`);
+    else if (a !== null && b !== null && (direction === 'asc' ? a > b : a < b))
+      out.push(`#${i}=${a} then #${i + 1}=${b}`);
   }
   return out;
 }
@@ -26,7 +27,10 @@ export function currentBeforeClosedViolations(current: readonly boolean[]): stri
 }
 
 /** Network edges whose endpoints are missing from the served node list (dangling references). */
-export function danglingEdges(nodes: readonly { node_id: number }[], edges: readonly { id: number; src_node_id: number; dst_node_id: number }[]): number[] {
+export function danglingEdges(
+  nodes: readonly { node_id: number }[],
+  edges: readonly { id: number; src_node_id: number; dst_node_id: number }[],
+): number[] {
   const ids = new Set(nodes.map((n) => n.node_id));
   return edges.filter((e) => !ids.has(e.src_node_id) || !ids.has(e.dst_node_id)).map((e) => e.id);
 }

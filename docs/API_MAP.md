@@ -1,7 +1,7 @@
 # API map
 
 > Owner: API agent. Source: organizer API docs (`docs/product/notes-A.md`, from llms-full.txt) + live probes with the Finalist 4 viewer key (2026-11-04 18:30-18:45, GET only).
-> Base: `API_URL` = `https://api.stonewake.ai`. Auth: `Authorization: Bearer <STONEWAKE_API_KEY>` (viewer, scopes `read`,`reports`, team `itac-4`). `/health` is unversioned and public.
+> Base: `API_URL` = `https://api.stonewake.ai`. Auth: `Authorization: Bearer <STONEWAKE_API_KEY>` (viewer, scopes `read`,`reports`, one team). `/health` is unversioned and public.
 > Limits: `x-ratelimit-limit: 600`/min per key (shared by every agent), `RateLimit-Policy` on every `/v1` response. Keep volume low; never probe the limit (ToS 4(g)).
 
 | Endpoint | Method | Auth | Used by UI flow | Priority | Schema | Spec file | Status |
@@ -39,5 +39,5 @@ Notes
 - 403 "wrong role" is not testable with one viewer key except through write verbs (T19) and scope-gated routes (`/v1/audit-log.csv` needs `audit`; our key lacks it).
 - Open question for the judges: docs say a malformed `team` gives 422, but `team=abc` gives 403 `forbidden` (only `team=` empty gives 422). Team-id format is not documented, so not filed as a bug; the spec pins only the well-formed foreign-team 403.
 - Network `limit` caps neighbour nodes, not edges (limit=20 -> 21 nodes incl. centre, 22 edges). Docs do not say which; not filed as a bug.
-- T18 UI-vs-API parity (same owners/officers on the Network page) is offered to Coverage: pick the node via `heldCompanyNodeId()` (`src/api/held-company.ts`).
+- T18 UI-vs-API parity (same owners/officers on the Network page) is offered to Coverage: pick the node via `heldCompanyNodeId()` (`src/api/live-picks.ts`).
 - Response time is logged per call as the `api-timing` annotation (warning only).
