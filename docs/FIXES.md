@@ -5,19 +5,20 @@
 ## Summary by category
 | Category | Count |
 |---|---|
-| hard wait | 0 |
-| brittle selector | 0 |
-| missing await | 0 |
-| test interdependence | 0 |
-| shared data | 0 |
-| wrong assertion | 0 |
-| outdated API | 0 |
-| config | 0 |
+| hard wait | 2 (F5, F18: all 3 `waitForTimeout` removed) |
+| brittle selector | 7 (F6, F10, F11, F12, F15, F19, F22) |
+| missing await | 0 (none in the baseline, BASELINE.md) |
+| test interdependence | 2 (F13, F23) |
+| shared data | 3 (F17, F21, FA8) |
+| wrong assertion | 7 (F4, F16, FA2, FA3, FA4, FA5, FA9) |
+| outdated API | 2 (F14, FA1) |
+| config | 6 (F3, F7, F8, F9, F20, FA7) |
 | CI | 0 |
-| secrets in code | 0 |
-| **Total** | **0** |
+| secrets in code | 3 (F1, F2, FA6) |
+| **Total** | **32** |
 
-<!-- One-line summary for the video and STP, e.g. "14 hard waits removed, 9 XPath selectors replaced". -->
+**One line:** 32 automation faults fixed: 3 hard waits and 18 XPath + 27 structural CSS selectors removed, 67 absolute URLs replaced by baseURL, judges' credentials taken out of code, 4 wrong API expectations (Token header, `data` list, iso2 GE, search limit 50) corrected against the API docs (no product bug behind any of the 10 baseline failures).
+Rows still marked Open in the log (F2, F5, F6, F7) are closed by later rows: F2 by FA6 and F9, F5 by F18, F6 by F19, F7 by FA7 and F20.
 
 ## Fix log
 | ID | Category | File | Problem | Fix | Commit |
